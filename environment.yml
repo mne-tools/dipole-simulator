@@ -1,0 +1,12 @@
+name: voila-gallery-mne
+channels:
+- conda-forge
+dependencies:
+- numpy
+- scipy
+- matplotlib
+- ipywidgets
+- voila
+- ipympl
+- pip:
+  - mne
