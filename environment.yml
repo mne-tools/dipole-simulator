@@ -11,4 +11,4 @@ dependencies:
 - ipympl
 - pip
 - pip:
-  - https://github.com/larsoner/mne-python/archive/fwd-dip.zip
+  - https://github.com/mne-tools/mne-python/archive/maint/0.20.zip
