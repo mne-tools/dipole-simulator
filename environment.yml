@@ -9,4 +9,4 @@ dependencies:
 - voila
 - ipympl
 - pip:
-  - mne
+  - https://github.com/larsoner/mne-python/archive/fwd-dip.zip
