@@ -9,6 +9,8 @@ dependencies:
 - ipywidgets
 - voila
 - ipympl
+- psutil
+- nilearn
 - pip
 - pip:
   - https://github.com/mne-tools/mne-python/archive/maint/0.20.zip
