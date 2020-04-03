@@ -1,16 +1,15 @@
-name: voila-gallery-mne
+name: dipole-demo
 channels:
 - conda-forge
 dependencies:
 - python
 - numpy
 - scipy
+- nibabel
 - matplotlib-base
 - ipywidgets
 - voila
 - ipympl
-- psutil
-- nilearn
 - pip
 - pip:
   - https://github.com/mne-tools/mne-python/archive/maint/0.20.zip
