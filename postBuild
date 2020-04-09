@@ -1,0 +1,4 @@
+set -e
+curl -L -o fwd.tar.gz https://github.com/hoechenberger/dipoles_demo_data/raw/lfs/fwd.tar.gz
+tar xzvf fwd.tar.gz
+rm fwd.tar.gz
