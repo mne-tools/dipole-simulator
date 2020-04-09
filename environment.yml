@@ -5,7 +5,7 @@ dependencies:
 - python
 - numpy
 - scipy
-- nibabel
+- nilearn
 - matplotlib-base
 - ipywidgets
 - voila
