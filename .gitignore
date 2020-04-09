@@ -2,3 +2,6 @@
 .pytest_cache/
 .vscode/
 data/sample-bem-sol.fif
+data/fwd/
+old/
+.DS_Store
