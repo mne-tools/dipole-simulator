@@ -26,7 +26,8 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
     x = event.xdata
     y = event.ydata
 
-    x_idx, y_idx, remaining_idx = get_axis_names_from_slice(axis)
+    x_idx, y_idx = get_axis_names_from_slice(axis)
+    remaining_idx = axis
 
     if state['mode'] == 'slice_browser':
         handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
@@ -108,8 +109,10 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
     state['dipole_ori']['y'] = None
     state['dipole_ori']['z'] = None
 
-    widget['fig'][x_idx].axes[0].clear()
-    widget['fig'][y_idx].axes[0].clear()
+    # widget['fig'][x_idx].axes[0].clear()
+    # widget['fig'][y_idx].axes[0].clear()
+    widget['fig'][x_idx].axes[0].images = []
+    widget['fig'][y_idx].axes[0].images = []
 
     plot_slice(widget, state, x_idx, x, t1_img)
     plot_slice(widget, state, y_idx, y, t1_img)

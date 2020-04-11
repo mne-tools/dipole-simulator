@@ -114,5 +114,4 @@ def get_axis_names_from_slice(slice_view, all_axes):
         x_idx = 'x'
         y_idx = 'y'
 
-    remaining_idx = list(set(all_axes) - set([x_idx, y_idx]))[0]
-    return x_idx, y_idx, remaining_idx
+    return x_idx, y_idx
