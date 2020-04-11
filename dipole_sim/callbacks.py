@@ -113,6 +113,7 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
 
     plot_slice(widget, state, x_idx, x, t1_img)
     plot_slice(widget, state, y_idx, y, t1_img)
+    draw_crosshairs(widget=widget, state=state)
 
     enable_crosshair_cursor(widget)
     reset_topomaps(widget, evoked)
@@ -164,7 +165,7 @@ def handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
                                        dipole_ori_ras['z']))
     dipole_ori_head /= 1000
     dipole_ori_head = dict(x=dipole_ori_head[0], y=dipole_ori_head[1],
-                            z=dipole_ori_head[2])
+                           z=dipole_ori_head[2])
 
     label_text = (f"x={int(round(dipole_ori_ras['x']))}, "
                   f"y={int(round(dipole_ori_ras['y']))}, "
