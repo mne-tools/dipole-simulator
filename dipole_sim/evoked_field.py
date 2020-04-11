@@ -114,9 +114,17 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t):
                             axes=ax_topomap)
         ax_topomap.set_title(None)
 #             ax_topomap.format_coord = _create_format_coord('topomap')
-        fig.colorbar(ax_topomap.images[-1], cax=ax_colorbar,
-                     orientation='horizontal')
+        cb = fig.colorbar(ax_topomap.images[-1], cax=ax_colorbar,
+                          orientation='horizontal')
 
+        if ch_type == 'mag':
+            label = 'fT'
+        elif ch_type == 'grad':
+            label = 'fT/cm'
+        elif ch_type == 'eeg':
+            label = 'µV'
+
+        cb.set_label(label, fontweight='bold')
         fig.canvas.draw()
 
     state['label_text']['topomap_mag'] = old_topomap_mag_label_text
