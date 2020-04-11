@@ -3,7 +3,7 @@ from nilearn.plotting import plot_anat
 
 import matplotlib.pyplot as plt
 
-from utils import _create_format_coord
+from utils import _create_format_coord, get_axis_names_from_slice
 
 
 def plot_slice(widget, state, axis, pos, t1_img):
@@ -20,6 +20,7 @@ def plot_slice(widget, state, axis, pos, t1_img):
                         figure=fig, dim=-0.5)
 
     img.axes[pos].ax.format_coord = _create_format_coord(axis)
+    draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
     state['label_text'][axis] = old_label_text
     _update_axis_label(widget, state, axis)
@@ -43,20 +44,22 @@ def _update_axis_label(widget, state, axis):
 
 
 def draw_crosshairs(widget, state):
+    kwargs = dict(color='white', label='crosshair', lw=0.5)
     # Remove potentially existing crosshairs.
     for axis in widget['fig'].keys():
-        ax = widget['fig'][axis].axes[0]
+        if not widget['fig'][axis].axes:
+            continue
+
+        ax = widget['fig'][axis].axes[-1]
         lines_to_keep = [line for line in ax.lines
                          if line.get_label() != 'crosshair']
         ax.lines = lines_to_keep
 
-    kwargs = dict(color='white', label='crosshair', lw=0.5)
-    widget['fig']['x'].axes[0].axvline(state['crosshair_pos']['y'], **kwargs)
-    widget['fig']['x'].axes[0].axhline(state['crosshair_pos']['z'], **kwargs)
-    widget['fig']['y'].axes[0].axvline(state['crosshair_pos']['x'], **kwargs)
-    widget['fig']['y'].axes[0].axhline(state['crosshair_pos']['z'], **kwargs)
-    widget['fig']['z'].axes[0].axvline(state['crosshair_pos']['x'], **kwargs)
-    widget['fig']['z'].axes[0].axhline(state['crosshair_pos']['y'], **kwargs)
+        x_axis, y_axis = get_axis_names_from_slice(
+            slice_view=axis, all_axes=widget['fig'].keys())
+
+        ax.axvline(state['crosshair_pos'][x_axis], **kwargs)
+        ax.axhline(state['crosshair_pos'][y_axis], **kwargs)
 
     widget['fig']['x'].canvas.draw()
     widget['fig']['y'].canvas.draw()

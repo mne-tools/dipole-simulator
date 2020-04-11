@@ -139,8 +139,9 @@ class App:
             if fig is in_ax.figure:
                 break
 
-        x_idx, y_idx, remaining_idx = get_axis_names_from_slice(
-            slice_view=axis, all_axes=widget['fig'].keys())
+        x_idx, y_idx = get_axis_names_from_slice(slice_view=axis,
+                                                 all_axes=widget['fig'].keys())
+        remaining_idx = axis
 
         if state['mode'] == 'slice_browser':
             handle_click_in_slice_browser_mode(widget, markers, state, x, y,
