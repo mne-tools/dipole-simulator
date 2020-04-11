@@ -113,7 +113,6 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
 
     plot_slice(widget, state, x_idx, x, t1_img)
     plot_slice(widget, state, y_idx, y, t1_img)
-    draw_crosshairs(widget=widget, state=state)
 
     enable_crosshair_cursor(widget)
     reset_topomaps(widget, evoked)

@@ -20,6 +20,7 @@ def plot_slice(widget, state, axis, pos, t1_img):
                         figure=fig, dim=-0.5)
 
     img.axes[pos].ax.format_coord = _create_format_coord(axis)
+    draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
     state['label_text'][axis] = old_label_text
     _update_axis_label(widget, state, axis)
