@@ -1,4 +1,5 @@
-from ipywidgets import Accordion, Label, ToggleButtons, Output, VBox, HBox
+from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
+                        ToggleButtons)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -36,7 +37,9 @@ class App:
                            else pathlib.Path(data_path))
         self._fwd_path = self._data_path / 'fwd'
         self._subjects_dir = self._data_path / 'subjects'
+        self._bem_path = self._data_path / f'{subject}-bem-sol.fif'
 
+        self._exact_solution = False
         self._state = self._init_state()
         self._widget = self._init_widget()
         self._markers = self._init_markers()
@@ -68,6 +71,9 @@ class App:
         state['dipole_arrows'] = []
         state['mode'] = 'slice_browser'
         return state
+
+    def _toggle_exact_solution(self, change):
+        self._exact_solution = not self._exact_solution
 
     def _init_widget(self):
         state = self._state
@@ -101,6 +107,14 @@ class App:
         toggle_buttons['mode_selector'].observe(self._handle_view_mode_change,
                                                 'value')
         widget['toggle_buttons'] = toggle_buttons
+
+        checkbox = dict(exact_solution=Checkbox(
+            value=self._exact_solution,
+            description='Exact solution (slow!)',
+            tooltip='Calculate an exact forward projection. This is SLOW!'))
+        checkbox['exact_solution'].observe(self._toggle_exact_solution,
+                                           'value')
+        widget['checkbox'] = checkbox
 
         widget['output'] = output_widget
         accordion = Accordion(
@@ -165,7 +179,9 @@ class App:
                 state['dipole_pos'] != state['dipole_ori']):
             plot_evoked(widget, state, fwd_path=self._fwd_path,
                         subject=self._subject, info=self._info,
-                        ras_to_head_t=self._ras_to_head_t)
+                        ras_to_head_t=self._ras_to_head_t,
+                        exact_solution=self._exact_solution,
+                        bem_path=self._bem_path, head_to_mri_t=self._trans)
 
     def _handle_slice_mouse_enter(self, event):
         pass
@@ -229,6 +245,7 @@ class App:
 
     def _gen_app_layout(self):
         toggle_buttons = self._widget['toggle_buttons']
+        checkbox = self._widget['checkbox']
         label = self._widget['label']
         fig = self._widget['fig']
         topomap_fig = self._widget['topomap_fig']
@@ -238,7 +255,8 @@ class App:
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
              HBox([label['dipole_ori_'], label['dipole_ori']])])
 
-        app = VBox([toggle_buttons['mode_selector'],
+        app = VBox([HBox([toggle_buttons['mode_selector'],
+                          checkbox['exact_solution']]),
                     HBox([VBox([label['axis']['x'], fig['x'].canvas]),
                           VBox([label['axis']['y'], fig['y'].canvas]),
                           VBox([label['axis']['z'], fig['z'].canvas])]),
