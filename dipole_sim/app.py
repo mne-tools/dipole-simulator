@@ -3,7 +3,7 @@ import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
 
-from slice import create_slice_fig, draw_crosshairs, plot_slice
+from slice import create_slice_fig, plot_slice
 from evoked_field import create_topomap_fig, plot_sensors, plot_evoked
 from cursor import enable_crosshair_cursor
 from utils import gen_ras_to_head_trans, get_axis_names_from_slice
@@ -43,7 +43,6 @@ class App:
 
         self._plot_slice(axis='all')
 
-        self._draw_slice_crosshairs()
         self._plot_sensors()
         self._enable_crosshair_cursor()
 
@@ -206,9 +205,6 @@ class App:
     def _enable_crosshair_cursor(self):
         enable_crosshair_cursor(self._widget)
 
-    def _draw_slice_crosshairs(self):
-        draw_crosshairs(widget=self._widget, state=self._state)
-
     def _plot_sensors(self, ch_type=None):
         if ch_type is None:
             ch_types = ('mag', 'grad', 'eeg')
@@ -261,7 +257,6 @@ class App:
 
 
 if __name__ == '__main__':
-    from callbacks import handle_click, handle_enter, handle_leave
     import mne
     import nilearn
 
@@ -288,8 +283,5 @@ if __name__ == '__main__':
 
     app = App(evoked=evoked,
               trans=head_to_mri_t,
-              t1_img=t1_img,
-              slice_click_callback=handle_click,
-              slice_mouse_enter_callback=handle_enter,
-              slice_mouse_leave_callback=handle_leave)
+              t1_img=t1_img)
     app.display()
