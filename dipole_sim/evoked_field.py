@@ -4,7 +4,8 @@ import mne
 from mne.transforms import apply_trans
 
 from utils import create_head_grid, find_closest
-from download import download_fwd_from_github
+from download import download_fwd_from_github, download_bem_from_github
+from forward import gen_forward_solution
 
 
 def _update_topomap_label(widget, state, ch_type):
@@ -20,7 +21,8 @@ def gen_evoked(pos, ori, info, fwd):
     return evoked
 
 
-def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t):
+def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
+                exact_solution, bem_path=None, head_to_mri_t=None):
     old_topomap_mag_label_text = state['label_text']['topomap_mag']
     new_topomap_mag_label_text = old_topomap_mag_label_text + ' [updating]'
     state['label_text']['topomap_mag'] = new_topomap_mag_label_text
@@ -53,43 +55,58 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t):
     dipole_pos = np.array(dipole_pos).reshape(1, 3).round(3)
     dipole_ori = np.array(dipole_ori).reshape(1, 3).round(3)
 
-#     fwd = gen_forward_solution(dipole_pos, bem=bem, info=info,
-# trans=head_to_mri_t)
-
-    # Retrieve the dipole pos closest to the one we have a pre-calculated fwd
-    # for.
-    pos_head_grid = create_head_grid(info=info)
-    dipole_pos_for_fwd = (find_closest(pos_head_grid[0], dipole_pos[0, 0]),
-                          find_closest(pos_head_grid[1], dipole_pos[0, 1]),
-                          find_closest(pos_head_grid[2], dipole_pos[0, 2]))
-
-    print(f'Requested calculations for dipole located at:\n'
-          f'    x={dipole_pos[0, 0]}, y={dipole_pos[0, 1]}, '
-          f'z={dipole_pos[0, 2]} [m, MNE Head]\n'
-          f'Using a forward solution for the following location:\n'
-          f'    x={dipole_pos_for_fwd[0]}, y={dipole_pos_for_fwd[1]}, '
-          f'z={dipole_pos_for_fwd[2]} [m, MNE Head]\n')
-
-    fwd_fname = (f'{subject}-{dipole_pos_for_fwd[0]}-{dipole_pos_for_fwd[1]}-'
-                 f'{dipole_pos_for_fwd[2]}-fwd.fif')
-    if (fwd_path / fwd_fname).exists():
-        print(f'\nUsing existing forward solution: {fwd_fname}')
+    if exact_solution:
+        if (bem_path).exists():
+            print(f'\nUsing existing BEM solution: {bem_path}\n')
+        else:
+            print('Retrieving BEM solution from GitHub.')
+            try:
+                download_bem_from_github(data_path=bem_path.parent,
+                                         subject=subject,
+                                         overwrite=False)
+            except RuntimeError as e:
+                msg = (f'Failed to retrieve the BEM solution. '
+                       f'The error was: {e}\n')
+                raise RuntimeError(msg)
+        bem = mne.read_bem_solution(bem_path)
+        fwd = gen_forward_solution(pos=dipole_pos, bem=bem, info=info,
+                                   trans=head_to_mri_t)
     else:
-        print('Retrieving forward solution from GitHub.')
-        try:
-            download_fwd_from_github(fwd_path=fwd_path, subject=subject,
-                                     dipole_pos=dipole_pos_for_fwd)
-        except RuntimeError as e:
-            msg = (f'Failed to retrieve pre-calculated forward solution. '
-                   f'The error was: {e}\n\n'
-                   f'Please try again with another dipole origin inside the '
-                   f'brain.')
-            raise RuntimeError(msg)
+        # Retrieve the dipole pos closest to the one we have a pre-calculated
+        # fwd for.
+        pos_head_grid = create_head_grid(info=info)
+        dipole_pos_for_fwd = (find_closest(pos_head_grid[0], dipole_pos[0, 0]),
+                              find_closest(pos_head_grid[1], dipole_pos[0, 1]),
+                              find_closest(pos_head_grid[2], dipole_pos[0, 2]))
 
-    fwd = mne.read_forward_solution(fwd_path / fwd_fname)
-    del fwd_fname, pos_head_grid, dipole_pos_for_fwd
+        print(f'Requested calculations for dipole located at:\n'
+              f'    x={dipole_pos[0, 0]}, y={dipole_pos[0, 1]}, '
+              f'z={dipole_pos[0, 2]} [m, MNE Head]\n'
+              f'Using a forward solution for the following location:\n'
+              f'    x={dipole_pos_for_fwd[0]}, y={dipole_pos_for_fwd[1]}, '
+              f'z={dipole_pos_for_fwd[2]} [m, MNE Head]\n')
 
-    fwd = mne.forward.convert_forward_solution(fwd=fwd, force_fixed=True)
+        fwd_fname = (f'{subject}-{dipole_pos_for_fwd[0]}-'
+                     f'{dipole_pos_for_fwd[1]}-'
+                     f'{dipole_pos_for_fwd[2]}-fwd.fif')
+        if (fwd_path / fwd_fname).exists():
+            print(f'\nUsing existing forward solution: {fwd_fname}\n')
+        else:
+            print('Retrieving forward solution from GitHub.')
+            try:
+                download_fwd_from_github(fwd_path=fwd_path, subject=subject,
+                                         dipole_pos=dipole_pos_for_fwd)
+            except RuntimeError as e:
+                msg = (f'Failed to retrieve pre-calculated forward solution. '
+                       f'The error was: {e}\n\n'
+                       f'Please try again with another dipole origin inside '
+                       f'the brain.')
+                raise RuntimeError(msg)
+
+        fwd = mne.read_forward_solution(fwd_path / fwd_fname)
+        fwd = mne.forward.convert_forward_solution(fwd=fwd, force_fixed=True)
+        del fwd_fname, pos_head_grid, dipole_pos_for_fwd
+
     evoked = gen_evoked(pos=dipole_pos, ori=dipole_ori, info=info, fwd=fwd)
 
     for ch_type, fig in widget['topomap_fig'].items():
