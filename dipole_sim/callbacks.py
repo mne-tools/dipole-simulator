@@ -112,7 +112,9 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
     # widget['fig'][x_idx].axes[0].clear()
     # widget['fig'][y_idx].axes[0].clear()
     widget['fig'][x_idx].axes[0].images = []
+    widget['fig'][x_idx].axes[0].texts = []
     widget['fig'][y_idx].axes[0].images = []
+    widget['fig'][y_idx].axes[0].texts = []
 
     plot_slice(widget, state, x_idx, x, t1_img)
     plot_slice(widget, state, y_idx, y, t1_img)
