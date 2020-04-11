@@ -1,6 +1,7 @@
 .ipynb_checkpoints/
 .pytest_cache/
 .vscode/
+__pycache__/
 data/sample-bem-sol.fif
 data/fwd/*.fif
 old/
