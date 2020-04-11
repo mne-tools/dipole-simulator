@@ -74,7 +74,7 @@ def _create_format_coord(axis):
     elif axis == 'z':
         x_label = 'x'
         y_label = 'y'
-    
+
     # FIXME
     def format_coord(x, y, x_label, y_label):
         return f'{x_label}={x:.1f} mm, {y_label}={y:.1f} mm'

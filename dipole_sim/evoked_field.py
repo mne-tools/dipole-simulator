@@ -4,7 +4,7 @@ import mne
 from mne.transforms import apply_trans
 
 from utils import create_head_grid, find_closest
-from download_fwd import download_from_github
+from download import download_fwd_from_github
 
 
 def _update_topomap_label(widget, state, ch_type):
@@ -77,8 +77,8 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t):
     else:
         print('Retrieving forward solution from GitHub.')
         try:
-            download_from_github(fwd_path=fwd_path, subject=subject,
-                                 dipole_pos=dipole_pos_for_fwd)
+            download_fwd_from_github(fwd_path=fwd_path, subject=subject,
+                                     dipole_pos=dipole_pos_for_fwd)
         except RuntimeError as e:
             msg = (f'Failed to retrieve pre-calculated forward solution. '
                    f'The error was: {e}\n\n'
