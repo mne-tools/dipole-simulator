@@ -1,8 +1,10 @@
 set -e
-curl -L -o fwd.tar.gz https://github.com/hoechenberger/dipoles_demo_data/raw/master/fwd.tar.gz
+# curl -L -o fwd.tar.gz https://github.com/hoechenberger/dipoles_demo_data/raw/master/fwd.tar.gz
+curl -L -o fwd.tar.gz https://zenodo.org/record/3748909/files/bem.tar.gz?download=1
 tar xzvf fwd.tar.gz
 rm fwd.tar.gz
 
-curl -L -o bem.tar.gz https://github.com/hoechenberger/dipoles_demo_data/raw/master/bem.tar.gz
+# curl -L -o bem.tar.gz https://github.com/hoechenberger/dipoles_demo_data/raw/master/bem.tar.gz
+curl -L -o bem.tar.gz https://zenodo.org/record/3748909/files/fwd.tar.gz?download=1
 tar xzvf bem.tar.gz
 rm bem.tar.gz
