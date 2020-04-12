@@ -92,7 +92,7 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
         if (fwd_path / fwd_fname).exists():
             print(f'\nUsing existing forward solution: {fwd_fname}\n')
         else:
-            print('Retrieving forward solution from GitHub.')
+            print('Retrieving forward solution from GitHub.\n\n')
             try:
                 download_fwd_from_github(fwd_path=fwd_path, subject=subject,
                                          dipole_pos=dipole_pos_for_fwd)
@@ -167,7 +167,13 @@ def create_topomap_fig():
 
 def reset_topomaps(widget, evoked):
     for ch_type in ['mag', 'grad', 'eeg']:
+        # Clear topomap.
         widget['topomap_fig'][ch_type].axes[0].clear()
+
+        # Clear colorbar.
+        widget['topomap_fig'][ch_type].axes[1].clear()
+        widget['topomap_fig'][ch_type].axes[1].set_axis_off()
+
         plot_sensors(widget=widget, evoked=evoked, ch_type=ch_type)
         widget['topomap_fig'][ch_type].canvas.draw()
 
