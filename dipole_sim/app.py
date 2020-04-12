@@ -62,6 +62,7 @@ class App:
         state['crosshair_pos'] = dict(x=0, y=0, z=0)
         state['dipole_pos'] = dict(x=None, y=None, z=None)
         state['dipole_ori'] = dict(x=None, y=None, z=None)
+        state['dipole_amplitude'] = 10e-9  # Am
         state['label_text'] = dict(x='sagittal',
                                    y='coronal',
                                    z='axial',

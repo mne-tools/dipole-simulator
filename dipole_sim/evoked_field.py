@@ -14,9 +14,17 @@ def _update_topomap_label(widget, state, ch_type):
     label.value = label_text
 
 
-def gen_evoked(pos, ori, info, fwd):
-    leadfield = fwd['sol']['data']
-    meeg_data = np.dot(leadfield, ori.T)  # compute forward
+def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
+    dipole_ori /= np.linalg.norm(dipole_ori)
+
+    # Convert fwd to "free" orientation, then apply the correct weights
+    # to each dimension of the leadfield.
+    fwd_free = mne.convert_forward_solution(fwd, force_fixed=False)
+    leadfield_free = fwd_free['sol']['data']
+    leadfield_fixed = np.dot(leadfield_free, dipole_ori.T)
+
+    # Now do the actual forward projection and generate an Evoked object.
+    meeg_data = leadfield_fixed * dipole_amplitude
     evoked = mne.EvokedArray(meeg_data, info)
     return evoked
 
@@ -54,6 +62,8 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
 
     dipole_pos = np.array(dipole_pos).reshape(1, 3).round(3)
     dipole_ori = np.array(dipole_ori).reshape(1, 3).round(3)
+
+    dipole_amplitude = state['dipole_amplitude']
 
     if exact_solution:
         if (bem_path).exists():
@@ -107,7 +117,10 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
         fwd = mne.forward.convert_forward_solution(fwd=fwd, force_fixed=True)
         del fwd_fname, pos_head_grid, dipole_pos_for_fwd
 
-    evoked = gen_evoked(pos=dipole_pos, ori=dipole_ori, info=info, fwd=fwd)
+    evoked = gen_evoked(fwd=fwd,
+                        dipole_ori=dipole_ori,
+                        dipole_amplitude=dipole_amplitude,
+                        info=info)
 
     for ch_type, fig in widget['topomap_fig'].items():
         ax_topomap = fig.axes[0]

@@ -4,7 +4,7 @@ from mne.transforms import combine_transforms, invert_transform, Transform
 
 
 def create_head_grid(info, grid_steps=25):
-    """Find max. extensoion of the head in either dimension, create a
+    """Find max. extensoion of the head in either dimension, and create a
     grid corresponding to our pre-computed forward solutions.
     """
     xmin, xmax = None, None
