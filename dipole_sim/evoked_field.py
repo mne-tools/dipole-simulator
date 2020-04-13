@@ -17,13 +17,15 @@ def _update_topomap_label(widget, state, ch_type):
 def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
     dipole_ori /= np.linalg.norm(dipole_ori)
 
-    # Convert fwd to "free" orientation, then apply the correct weights
-    # to each dimension of the leadfield.
-    fwd_free = mne.convert_forward_solution(fwd, force_fixed=False)
-    leadfield_free = fwd_free['sol']['data']
+    # Apply the correct weights to each dimension of the leadfield, which is
+    # based on a "free" orientation forward model. This essentially collapses
+    # the three "free" orientation dimensions into a single "fixed" orientation
+    # dimension.
+    leadfield_free = fwd['sol']['data']
     leadfield_fixed = np.dot(leadfield_free, dipole_ori.T)
 
-    # Now do the actual forward projection and generate an Evoked object.
+    # Now do the actual forward projection (which simply means: scale the
+    # leadfield by the dipole amplitude), and generate an Evoked object.
     meeg_data = leadfield_fixed * dipole_amplitude
     evoked = mne.EvokedArray(meeg_data, info)
     return evoked
@@ -114,7 +116,6 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                 raise RuntimeError(msg)
 
         fwd = mne.read_forward_solution(fwd_path / fwd_fname)
-        fwd = mne.forward.convert_forward_solution(fwd=fwd, force_fixed=True)
         del fwd_fname, pos_head_grid, dipole_pos_for_fwd
 
     evoked = gen_evoked(fwd=fwd,
@@ -143,7 +144,7 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                             show=False,
                             axes=ax_topomap)
         ax_topomap.set_title(None)
-#             ax_topomap.format_coord = _create_format_coord('topomap')
+        # ax_topomap.format_coord = _create_format_coord('topomap')
         cb = fig.colorbar(ax_topomap.images[-1], cax=ax_colorbar,
                           orientation='horizontal')
 
