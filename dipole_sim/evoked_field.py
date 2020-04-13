@@ -16,13 +16,14 @@ def _update_topomap_label(widget, state, ch_type):
 
 def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
     dipole_ori /= np.linalg.norm(dipole_ori)
+    dipole_ori = dipole_ori.reshape(3, 1)
 
     # Apply the correct weights to each dimension of the leadfield, which is
     # based on a "free" orientation forward model. This essentially collapses
     # the three "free" orientation dimensions into a single "fixed" orientation
     # dimension.
     leadfield_free = fwd['sol']['data']
-    leadfield_fixed = np.dot(leadfield_free, dipole_ori.T)
+    leadfield_fixed = leadfield_free @ dipole_ori
 
     # Now do the actual forward projection (which simply means: scale the
     # leadfield by the dipole amplitude), and generate an Evoked object.
