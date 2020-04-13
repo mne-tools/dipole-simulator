@@ -2,7 +2,7 @@ name: dipole-demo
 channels:
 - conda-forge
 dependencies:
-- python
+- python >=3.6
 - numpy
 - scipy
 - nilearn
@@ -11,6 +11,4 @@ dependencies:
 - voila
 - ipympl
 - requests
-- pip
-- pip:
-  - https://github.com/mne-tools/mne-python/archive/maint/0.20.zip
+- mne =0.20
