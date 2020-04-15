@@ -99,9 +99,10 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
               f'    x={dipole_pos_for_fwd[0]}, y={dipole_pos_for_fwd[1]}, '
               f'z={dipole_pos_for_fwd[2]} [m, MNE Head]\n')
 
-        fwd_fname = (f'{subject}-{dipole_pos_for_fwd[0]}-'
-                     f'{dipole_pos_for_fwd[1]}-'
-                     f'{dipole_pos_for_fwd[2]}-fwd.fif')
+        fwd_fname = (f'{subject}-'
+                     f'{dipole_pos_for_fwd[0]:.3f}-'
+                     f'{dipole_pos_for_fwd[1]:.3f}-'
+                     f'{dipole_pos_for_fwd[2]:.3f}-fwd.fif')
         if (fwd_path / fwd_fname).exists():
             print(f'\nUsing existing forward solution: {fwd_fname}\n')
         else:

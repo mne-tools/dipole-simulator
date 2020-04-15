@@ -3,7 +3,7 @@ from functools import partial
 from mne.transforms import combine_transforms, invert_transform, Transform
 
 
-def create_head_grid(info, grid_steps=25):
+def create_head_grid(info, grid_steps=50):
     """Find max. extensoion of the head in either dimension, and create a
     grid corresponding to our pre-computed forward solutions.
     """
