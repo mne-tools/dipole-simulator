@@ -186,12 +186,14 @@ class App:
         elif state['mode'] == 'set_dipole_pos':
             handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
                                                 remaining_idx, x, y,
-                                                self._ras_to_head_t)
+                                                self._ras_to_head_t,
+                                                evoked=self._evoked)
         elif state['mode'] == 'set_dipole_ori':
             # Construct the 3D coordinates of the clicked-on point
             handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
                                                 remaining_idx, x, y,
-                                                self._ras_to_head_t)
+                                                self._ras_to_head_t,
+                                                evoked=self._evoked)
 
         self._plot_dipole_markers_and_arrow()
         self._enable_crosshair_cursor()
