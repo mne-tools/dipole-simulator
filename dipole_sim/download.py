@@ -22,8 +22,10 @@ def download_fwd_from_zenodo(fwd_path, subject, dipole_pos,
 
 
 def download_fwd_from_github(fwd_path, subject, dipole_pos, overwrite=False):
-    x, y, z = dipole_pos
-    fname = f'{subject}-{x}-{y}-{z}-fwd.fif'
+    fname = (f'{subject}-'
+             f'{dipole_pos[0]:.3f}-'
+             f'{dipole_pos[1]:.3f}-'
+             f'{dipole_pos[2]:.3f}-fwd.fif')
 
     if (fwd_path / fname).exists() and not overwrite:
         return

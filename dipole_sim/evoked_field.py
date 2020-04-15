@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import mne
 from mne.transforms import apply_trans
 
-from utils import create_head_grid, find_closest
+from slice import create_head_grid
+from math_ import find_closest
 from download import download_fwd_from_github, download_bem_from_github
 from forward import gen_forward_solution
 
@@ -14,9 +15,20 @@ def _update_topomap_label(widget, state, ch_type):
     label.value = label_text
 
 
-def gen_evoked(pos, ori, info, fwd):
-    leadfield = fwd['sol']['data']
-    meeg_data = np.dot(leadfield, ori.T)  # compute forward
+def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
+    dipole_ori /= np.linalg.norm(dipole_ori)
+    dipole_ori = dipole_ori.reshape(3, 1)
+
+    # Apply the correct weights to each dimension of the leadfield, which is
+    # based on a "free" orientation forward model. This essentially collapses
+    # the three "free" orientation dimensions into a single "fixed" orientation
+    # dimension.
+    leadfield_free = fwd['sol']['data']
+    leadfield_fixed = leadfield_free @ dipole_ori
+
+    # Now do the actual forward projection (which simply means: scale the
+    # leadfield by the dipole amplitude), and generate an Evoked object.
+    meeg_data = leadfield_fixed * dipole_amplitude
     evoked = mne.EvokedArray(meeg_data, info)
     return evoked
 
@@ -55,6 +67,8 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
     dipole_pos = np.array(dipole_pos).reshape(1, 3).round(3)
     dipole_ori = np.array(dipole_ori).reshape(1, 3).round(3)
 
+    dipole_amplitude = state['dipole_amplitude']
+
     if exact_solution:
         if (bem_path).exists():
             print(f'\nUsing existing BEM solution: {bem_path}\n')
@@ -86,9 +100,10 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
               f'    x={dipole_pos_for_fwd[0]}, y={dipole_pos_for_fwd[1]}, '
               f'z={dipole_pos_for_fwd[2]} [m, MNE Head]\n')
 
-        fwd_fname = (f'{subject}-{dipole_pos_for_fwd[0]}-'
-                     f'{dipole_pos_for_fwd[1]}-'
-                     f'{dipole_pos_for_fwd[2]}-fwd.fif')
+        fwd_fname = (f'{subject}-'
+                     f'{dipole_pos_for_fwd[0]:.3f}-'
+                     f'{dipole_pos_for_fwd[1]:.3f}-'
+                     f'{dipole_pos_for_fwd[2]:.3f}-fwd.fif')
         if (fwd_path / fwd_fname).exists():
             print(f'\nUsing existing forward solution: {fwd_fname}\n')
         else:
@@ -104,10 +119,12 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                 raise RuntimeError(msg)
 
         fwd = mne.read_forward_solution(fwd_path / fwd_fname)
-        fwd = mne.forward.convert_forward_solution(fwd=fwd, force_fixed=True)
         del fwd_fname, pos_head_grid, dipole_pos_for_fwd
 
-    evoked = gen_evoked(pos=dipole_pos, ori=dipole_ori, info=info, fwd=fwd)
+    evoked = gen_evoked(fwd=fwd,
+                        dipole_ori=dipole_ori,
+                        dipole_amplitude=dipole_amplitude,
+                        info=info)
 
     for ch_type, fig in widget['topomap_fig'].items():
         ax_topomap = fig.axes[0]
@@ -130,7 +147,7 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                             show=False,
                             axes=ax_topomap)
         ax_topomap.set_title(None)
-#             ax_topomap.format_coord = _create_format_coord('topomap')
+        # ax_topomap.format_coord = _create_format_coord('topomap')
         cb = fig.colorbar(ax_topomap.images[-1], cax=ax_colorbar,
                           orientation='horizontal')
 

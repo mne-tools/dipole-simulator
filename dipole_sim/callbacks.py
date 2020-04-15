@@ -2,12 +2,11 @@ from matplotlib.backend_bases import MouseButton
 from mne.transforms import apply_trans
 
 from evoked_field import plot_evoked, reset_topomaps
-from slice import plot_slice, draw_crosshairs
+from slice import plot_slice, draw_crosshairs, get_axis_names_from_slice
 from dipole import (draw_dipole_arrows, remove_dipole_arrows,
                     plot_dipole_pos_marker, remove_dipole_pos_markers,
                     plot_dipole_ori_marker, remove_dipole_ori_markers)
 from cursor import enable_crosshair_cursor
-from utils import get_axis_names_from_slice
 
 
 def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
