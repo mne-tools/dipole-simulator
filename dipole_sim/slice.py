@@ -7,11 +7,6 @@ from forward import _create_format_coord
 
 
 def plot_slice(widget, state, axis, pos, t1_img):
-    old_label_text = state['label_text'][axis]
-    new_label_text = old_label_text + ' [updating]'
-    state['label_text'][axis] = new_label_text
-    _update_axis_label(widget, state, axis)
-
     fig = widget['fig'][axis]
 
     with warnings.catch_warnings():  # Suppress DeprecationWarning
@@ -22,8 +17,6 @@ def plot_slice(widget, state, axis, pos, t1_img):
     img.axes[pos].ax.format_coord = _create_format_coord(axis)
     draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
-    state['label_text'][axis] = old_label_text
-    _update_axis_label(widget, state, axis)
 
 
 def create_slice_fig(handle_click, handle_enter, handle_leave):

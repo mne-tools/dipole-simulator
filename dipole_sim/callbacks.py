@@ -119,11 +119,12 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
     plot_slice(widget, state, y_idx, y, t1_img)
 
     enable_crosshair_cursor(widget)
-    reset_topomaps(widget, evoked)
+    reset_topomaps(widget=widget, evoked=evoked)
 
 
 def handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
-                                        remaining_idx, x, y, ras_to_head_t):
+                                        remaining_idx, x, y, ras_to_head_t,
+                                        evoked):
     # for axis in state['dipole_pos'].keys():
     #     state['dipole_pos'][axis] = state['slice_coord'][axis]['val']
 
@@ -149,12 +150,13 @@ def handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
                   f"y={round(dipole_pos_head['y'], 3)}, "
                   f"z={round(dipole_pos_head['z'], 3)} [m, MNE Head]")
     widget['label']['dipole_pos'].value = label_text
-
+    reset_topomaps(widget=widget, evoked=evoked)
     leave_set_dipole_pos_mode()
 
 
 def handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
-                                        remaining_idx, x, y, ras_to_head_t):
+                                        remaining_idx, x, y, ras_to_head_t,
+                                        evoked):
     dipole_ori_ras = dict()
     dipole_ori_ras[x_idx] = x
     dipole_ori_ras[y_idx] = y
@@ -177,3 +179,5 @@ def handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
                   f"y={round(dipole_ori_head['y'], 3)}, "
                   f"z={round(dipole_ori_head['z'], 3)} [m, MNE Head]")
     widget['label']['dipole_ori'].value = label_text
+    reset_topomaps(widget=widget, evoked=evoked)
+    leave_set_dipole_ori_mode()
