@@ -1,9 +1,9 @@
 set -e
 
-curl -L -o fwd.tar.gz https://zenodo.org/record/3748909/files/fwd.tar.gz?download=1
+curl -L -o fwd.tar.gz https://zenodo.org/record/3752121/files/fwd.tar.gz?download=1
 tar xzvf fwd.tar.gz
 rm fwd.tar.gz
 
-curl -L -o bem.tar.gz https://zenodo.org/record/3748909/files/bem.tar.gz?download=1
+curl -L -o bem.tar.gz https://zenodo.org/record/3752121/files/bem.tar.gz?download=1
 tar xzvf bem.tar.gz
 rm bem.tar.gz
