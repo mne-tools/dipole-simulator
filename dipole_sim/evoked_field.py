@@ -39,21 +39,6 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
     if fwd_lookup_table is None:
         raise ValueError('Must prodive fwd_lookup_table')
 
-    old_topomap_mag_label_text = state['label_text']['topomap_mag']
-    new_topomap_mag_label_text = old_topomap_mag_label_text + ' [updating]'
-    state['label_text']['topomap_mag'] = new_topomap_mag_label_text
-
-    old_topomap_grad_label_text = state['label_text']['topomap_grad']
-    new_topomap_grad_label_text = old_topomap_grad_label_text + ' [updating]'
-    state['label_text']['topomap_grad'] = new_topomap_grad_label_text
-
-    old_topomap_eeg_label_text = state['label_text']['topomap_eeg']
-    new_topomap_eeg_label_text = old_topomap_eeg_label_text + ' [updating]'
-    state['label_text']['topomap_eeg'] = new_topomap_eeg_label_text
-
-    for ch_type in ['mag', 'grad', 'eeg']:
-        _update_topomap_label(widget, state, ch_type)
-
     dipole_pos = (state['dipole_pos']['x'],
                   state['dipole_pos']['y'],
                   state['dipole_pos']['z'])
@@ -172,13 +157,6 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
 
         cb.set_label(label, fontweight='bold')
         fig.canvas.draw()
-
-    state['label_text']['topomap_mag'] = old_topomap_mag_label_text
-    state['label_text']['topomap_grad'] = old_topomap_grad_label_text
-    state['label_text']['topomap_eeg'] = old_topomap_eeg_label_text
-
-    for ch_type in ['mag', 'grad', 'eeg']:
-        _update_topomap_label(widget, state, ch_type)
 
 
 def create_topomap_fig():

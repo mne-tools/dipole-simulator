@@ -74,6 +74,7 @@ class App:
                                    topomap_eeg='Evoked EEG field')
         state['dipole_arrows'] = []
         state['mode'] = 'slice_browser'
+        state['updating'] = False
         return state
 
     def _toggle_exact_solution(self, change):
@@ -103,6 +104,7 @@ class App:
         label['dipole_ori'] = Label('Not set')
         label['dipole_pos_'] = Label('Dipole origin:')
         label['dipole_ori_'] = Label('Dipole orientation:')
+        label['updating'] = Label('Ready.')
         widget['label'] = label
 
         toggle_buttons = dict(mode_selector=ToggleButtons(
@@ -150,11 +152,20 @@ class App:
                                handle_leave=self._handle_slice_mouse_leave)
         return fig
 
+    def _toggle_updating_state(self):
+        self._state['updating'] = not self._state['updating']
+
+        if self._state['updating']:
+            self._widget['label']['updating'].value = 'Updating …'
+        else:
+            self._widget['label']['updating'].value = 'Ready.'
+
     @output_widget.capture(clear_output=True)
     def _handle_slice_click(self, event):
         if event.button != MouseButton.LEFT:
             return
 
+        self._toggle_updating_state()
         widget, markers, state = self._widget, self._markers, self._state
         in_ax = event.inaxes
         x, y = event.xdata, event.ydata
@@ -195,6 +206,8 @@ class App:
                         bem_path=self._bem_path, head_to_mri_t=self._trans,
                         fwd_lookup_table=self._fwd_lookup_table)
 
+        self._toggle_updating_state()
+
     def _handle_slice_mouse_enter(self, event):
         pass
 
@@ -202,6 +215,8 @@ class App:
         pass
 
     def _handle_amp_change(self, change):
+        self._toggle_updating_state()
+
         state = self._state
         widget = self._widget
 
@@ -216,6 +231,7 @@ class App:
                         ras_to_head_t=self._ras_to_head_t,
                         exact_solution=self._exact_solution,
                         bem_path=self._bem_path, head_to_mri_t=self._trans)
+        self._toggle_updating_state()
 
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
@@ -291,6 +307,7 @@ class App:
 
         app = VBox([HBox([toggle_buttons['mode_selector'],
                           dipole_amp_and_exact_sol_col]),
+                    label['updating'],
                     HBox([VBox([label['axis']['x'], fig['x'].canvas]),
                           VBox([label['axis']['y'], fig['y'].canvas]),
                           VBox([label['axis']['z'], fig['z'].canvas])]),
