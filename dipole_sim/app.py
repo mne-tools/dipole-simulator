@@ -1,5 +1,5 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
-                        ToggleButtons)
+                        ToggleButtons, IntSlider)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -62,7 +62,7 @@ class App:
         state['crosshair_pos'] = dict(x=0, y=0, z=0)
         state['dipole_pos'] = dict(x=None, y=None, z=None)
         state['dipole_ori'] = dict(x=None, y=None, z=None)
-        state['dipole_amplitude'] = 10e-9  # Am
+        state['dipole_amplitude'] = 50e-9  # Am
         state['label_text'] = dict(x='sagittal',
                                    y='coronal',
                                    z='axial',
@@ -116,6 +116,13 @@ class App:
         checkbox['exact_solution'].observe(self._toggle_exact_solution,
                                            'value')
         widget['checkbox'] = checkbox
+
+        widget['amplitude_slider'] = IntSlider(
+            value=int(self._state['dipole_amplitude'] * 1e9),
+            min=5, max=100, step=5, continuous_update=False)
+        widget['amplitude_slider'].observe(self._handle_amp_change,
+                                           names='value')
+        widget['label']['amplitude_slider'] = Label('Dipole amplitude in nAm')
 
         widget['output'] = output_widget
         accordion = Accordion(
@@ -190,6 +197,22 @@ class App:
     def _handle_slice_mouse_leave(self, event):
         pass
 
+    def _handle_amp_change(self, change):
+        state = self._state
+        widget = self._widget
+
+        new_amp = change['new'] * 1e-9
+        self._state['dipole_amplitude'] = new_amp
+
+        if (state['dipole_pos']['x'] is not None and
+                state['dipole_ori']['x'] is not None and
+                state['dipole_pos'] != state['dipole_ori']):
+            plot_evoked(widget, state, fwd_path=self._fwd_path,
+                        subject=self._subject, info=self._info,
+                        ras_to_head_t=self._ras_to_head_t,
+                        exact_solution=self._exact_solution,
+                        bem_path=self._bem_path, head_to_mri_t=self._trans)
+
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
         widget = self._widget
@@ -251,13 +274,19 @@ class App:
         fig = self._widget['fig']
         topomap_fig = self._widget['topomap_fig']
         accordion = self._widget['accordion']
+        dipole_amp_slider = self._widget['amplitude_slider']
 
         dipole_props_col = VBox(
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
              HBox([label['dipole_ori_'], label['dipole_ori']])])
 
+        dipole_amp_and_exact_sol_col = VBox(
+            [label['amplitude_slider'],
+             dipole_amp_slider,
+             checkbox['exact_solution']])
+
         app = VBox([HBox([toggle_buttons['mode_selector'],
-                          checkbox['exact_solution']]),
+                          dipole_amp_and_exact_sol_col]),
                     HBox([VBox([label['axis']['x'], fig['x'].canvas]),
                           VBox([label['axis']['y'], fig['y'].canvas]),
                           VBox([label['axis']['z'], fig['z'].canvas])]),
