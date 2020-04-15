@@ -34,7 +34,11 @@ def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
 
 
 def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
-                exact_solution, bem_path=None, head_to_mri_t=None):
+                exact_solution, bem_path=None, head_to_mri_t=None,
+                fwd_lookup_table=None):
+    if fwd_lookup_table is None:
+        raise ValueError('Must prodive fwd_lookup_table')
+
     old_topomap_mag_label_text = state['label_text']['topomap_mag']
     new_topomap_mag_label_text = old_topomap_mag_label_text + ' [updating]'
     state['label_text']['topomap_mag'] = new_topomap_mag_label_text
@@ -106,6 +110,14 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                      f'{dipole_pos_for_fwd[2]:.3f}-fwd.fif')
         if (fwd_path / fwd_fname).exists():
             print(f'\nUsing existing forward solution: {fwd_fname}\n')
+        elif not fwd_lookup_table.loc[str(dipole_pos_for_fwd[0]),
+                                      str(dipole_pos_for_fwd[1]),
+                                      str(dipole_pos_for_fwd[2])].iloc[0]:
+            msg = ('No pre-calculated foward solution available for this '
+                   'dipole. Please select a dipole origin clearly inside the '
+                   'brain.')
+            print(msg)
+            return
         else:
             print('Retrieving forward solution from GitHub.\n\n')
             try:

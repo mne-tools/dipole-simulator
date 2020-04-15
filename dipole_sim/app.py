@@ -13,6 +13,7 @@ from callbacks import (handle_click_in_slice_browser_mode,
                        handle_click_in_set_dipole_ori_mode)
 from dipole import (plot_dipole_pos_marker, plot_dipole_ori_marker,
                     draw_dipole_arrows)
+from forward import load_fwd_lookup_table
 
 
 # This widget will capture the MNE output.
@@ -38,6 +39,8 @@ class App:
         self._fwd_path = self._data_path / 'fwd'
         self._subjects_dir = self._data_path / 'subjects'
         self._bem_path = self._data_path / f'{subject}-bem-sol.fif'
+
+        self._fwd_lookup_table = load_fwd_lookup_table(fwd_path=self._fwd_path)
 
         self._exact_solution = False
         self._state = self._init_state()
@@ -189,7 +192,8 @@ class App:
                         subject=self._subject, info=self._info,
                         ras_to_head_t=self._ras_to_head_t,
                         exact_solution=self._exact_solution,
-                        bem_path=self._bem_path, head_to_mri_t=self._trans)
+                        bem_path=self._bem_path, head_to_mri_t=self._trans,
+                        fwd_lookup_table=self._fwd_lookup_table)
 
     def _handle_slice_mouse_enter(self, event):
         pass

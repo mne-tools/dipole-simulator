@@ -1,5 +1,6 @@
 import numpy as np
 from functools import partial
+import pandas as pd
 import mne
 
 
@@ -52,3 +53,15 @@ def _create_format_coord(axis):
         return f'{x_label}={x:.1f} mm, {y_label}={y:.1f} mm'
 
     return partial(format_coord, x_label=x_label, y_label=y_label)
+
+
+def load_fwd_lookup_table(fwd_path):
+    lookup_table_fname = 'fwd_lookup_table.csv'
+    lookup_table_path = fwd_path / lookup_table_fname
+
+    # Convert to str dtype to work around floating point precision issues
+    lookup_table = pd.read_csv(lookup_table_path,
+                               dtype=dict(x=str, y=str, z=str))
+    lookup_table = lookup_table.rename(columns={'success': 'fwd_exists'})
+    lookup_table = lookup_table.set_index(['x', 'y', 'z'])
+    return lookup_table
