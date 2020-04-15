@@ -6,7 +6,7 @@ import pandas as pd
 import mne
 
 from forward import gen_forward_solution
-from utils import create_head_grid
+from slice import create_head_grid
 
 
 data_path = pathlib.Path('../data')
@@ -38,7 +38,7 @@ del evoked_fname, evoked
 def gen_forward_files(x, y, z, bem, info, trans, verbose=True):
     if verbose:
         msg = (f'Processing forward solution for dipole location: '
-            f'x={x}, y={y}, z={z} [m, MNE Head]')
+               f'x={x}, y={y}, z={z} [m, MNE Head]')
         print(msg)
     pos = np.array([x, y, z])
 

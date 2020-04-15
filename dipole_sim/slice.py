@@ -1,9 +1,9 @@
+import numpy as np
 import warnings
 from nilearn.plotting import plot_anat
-
 import matplotlib.pyplot as plt
 
-from utils import _create_format_coord, get_axis_names_from_slice
+from forward import _create_format_coord
 
 
 def plot_slice(widget, state, axis, pos, t1_img):
@@ -64,3 +64,59 @@ def draw_crosshairs(widget, state):
     widget['fig']['x'].canvas.draw()
     widget['fig']['y'].canvas.draw()
     widget['fig']['z'].canvas.draw()
+
+
+def create_head_grid(info, grid_steps=50):
+    """Find max. extensoion of the head in either dimension, and create a
+    grid corresponding to our pre-computed forward solutions.
+    """
+    xmin, xmax = None, None
+    ymin, ymax = None, None
+    zmin, zmax = None, None
+
+    for dig in info['dig']:
+        x, y, z = dig['r']
+
+        if xmin is None:
+            xmin = x
+            xmax = x
+        elif x < xmin:
+            xmin = x
+        elif x > xmax:
+            xmax = x
+
+        if ymin is None:
+            ymin = y
+            ymax = y
+        elif y < ymin:
+            ymin = y
+        elif y > ymax:
+            ymax = y
+
+        if zmin is None:
+            zmin = z
+            zmax = z
+        elif z < zmin:
+            zmin = z
+        elif z > zmax:
+            zmax = z
+
+    x_grid = np.linspace(start=xmin, stop=xmax, num=grid_steps).round(3)
+    y_grid = np.linspace(start=ymin, stop=ymax, num=grid_steps).round(3)
+    z_grid = np.linspace(start=zmin, stop=zmax, num=grid_steps).round(3)
+    grid = np.meshgrid(x_grid, y_grid, z_grid, indexing='ij', sparse=True)
+    return grid
+
+
+def get_axis_names_from_slice(slice_view, all_axes):
+    if slice_view == 'x':
+        x_idx = 'y'
+        y_idx = 'z'
+    elif slice_view == 'y':
+        x_idx = 'x'
+        y_idx = 'z'
+    elif slice_view == 'z':
+        x_idx = 'x'
+        y_idx = 'y'
+
+    return x_idx, y_idx

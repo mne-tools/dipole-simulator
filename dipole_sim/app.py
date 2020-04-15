@@ -4,10 +4,10 @@ import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
 
-from slice import create_slice_fig, plot_slice
+from slice import create_slice_fig, plot_slice, get_axis_names_from_slice
 from evoked_field import create_topomap_fig, plot_sensors, plot_evoked
 from cursor import enable_crosshair_cursor
-from utils import gen_ras_to_head_trans, get_axis_names_from_slice
+from transforms import gen_ras_to_head_trans
 from callbacks import (handle_click_in_slice_browser_mode,
                        handle_click_in_set_dipole_pos_mode,
                        handle_click_in_set_dipole_ori_mode)

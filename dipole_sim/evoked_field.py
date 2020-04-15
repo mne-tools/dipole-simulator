@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import mne
 from mne.transforms import apply_trans
 
-from utils import create_head_grid, find_closest
+from slice import create_head_grid
+from math_ import find_closest
 from download import download_fwd_from_github, download_bem_from_github
 from forward import gen_forward_solution
 
