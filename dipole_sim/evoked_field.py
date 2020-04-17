@@ -87,7 +87,7 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
               f'z={dipole_pos[0, 2]} [m, MNE Head]\n'
               f'Using a forward solution for the following location:\n'
               f'    x={dipole_pos_for_fwd[0]}, y={dipole_pos_for_fwd[1]}, '
-              f'z={dipole_pos_for_fwd[2]} [m, MNE Head]\n')
+              f'z={dipole_pos_for_fwd[2]} [m, MNE Head]')
 
         fwd_fname = (f'{subject}-'
                      f'{dipole_pos_for_fwd[0]:.3f}-'
