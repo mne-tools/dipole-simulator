@@ -148,6 +148,8 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
     for ch_type, fig in widget['topomap_fig'].items():
         ax_topomap = fig.axes[0]
         ax_colorbar = fig.axes[1]
+        ax_topomap.clear()
+        ax_colorbar.clear()
 
         if ch_type == 'eeg':
             outlines = 'head'
