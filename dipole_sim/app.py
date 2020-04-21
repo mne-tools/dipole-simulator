@@ -92,12 +92,13 @@ class App:
         state['dipole_pos'] = dict(x=None, y=None, z=None)
         state['dipole_ori'] = dict(x=None, y=None, z=None)
         state['dipole_amplitude'] = 50e-9  # Am
-        state['label_text'] = dict(x='sagittal',
-                                   y='coronal',
-                                   z='axial',
-                                   topomap_mag='Evoked magnetometer field',
-                                   topomap_grad='Evoked gradiometer field',
-                                   topomap_eeg='Evoked EEG field')
+        state['label_text'] = dict(
+            x=(f'sagittal (x = {round(state["slice_coord"]["x"]["val"])} mm)'),
+            y=(f'coronal (y = {round(state["slice_coord"]["y"]["val"])} mm)'),
+            z=(f'axial (z = {round(state["slice_coord"]["z"]["val"])} mm)'),
+            topomap_mag='Evoked magnetometer field',
+            topomap_grad='Evoked gradiometer field',
+            topomap_eeg='Evoked EEG field')
         state['dipole_arrows'] = []
         state['mode'] = 'slice_browser'
         state['updating'] = False

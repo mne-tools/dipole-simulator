@@ -38,6 +38,19 @@ def plot_slice(widget, state, axis, pos, img_data):
     draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
 
+    label_text = state['label_text']
+    label_text['x'] = (f'sagittal '
+                       f'(x = {round(state["slice_coord"]["x"]["val"])} mm)')
+    label_text['y'] = (f'coronal '
+                       f'(y = {round(state["slice_coord"]["y"]["val"])} mm)')
+    label_text['z'] = (f'axial '
+                       f'(z = {round(state["slice_coord"]["z"]["val"])} mm)')
+
+    label_widget = widget['label']['axis']
+    label_widget['x'].value = label_text['x']
+    label_widget['y'].value = label_text['y']
+    label_widget['z'].value = label_text['z']
+
 
 def create_slice_fig(handle_click, handle_enter, handle_leave):
     fig, ax = plt.subplots(1, figsize=(2, 2))
