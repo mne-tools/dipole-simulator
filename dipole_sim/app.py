@@ -208,8 +208,7 @@ class App:
         if state['mode'] == 'slice_browser':
             handle_click_in_slice_browser_mode(widget, markers, state, x, y,
                                                x_idx, y_idx, self._evoked,
-                                               self._t1_img_canonical_data,
-                                               self._t1_img)
+                                               self._t1_img_canonical_data)
         elif state['mode'] == 'set_dipole_pos':
             handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
                                                 remaining_idx, x, y,
@@ -260,7 +259,9 @@ class App:
                         subject=self._subject, info=self._info,
                         ras_to_head_t=self._ras_to_head_t,
                         exact_solution=self._exact_solution,
-                        bem_path=self._bem_path, head_to_mri_t=self._trans)
+                        bem_path=self._bem_path, head_to_mri_t=self._trans,
+                        fwd_lookup_table=self._fwd_lookup_table,
+                        t1_img=self._t1_img)
         self._toggle_updating_state()
 
     def _plot_dipole_markers_and_arrow(self):

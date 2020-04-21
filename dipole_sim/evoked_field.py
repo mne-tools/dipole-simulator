@@ -63,7 +63,6 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
     dipole_pos_mri = apply_trans(t1_img.header.get_vox2ras_tkr(),
                                  dipole_pos_vox)
     dipole_pos_mri_m = dipole_pos_mri / 1000.
-    print(dipole_pos_mri, dipole_pos_mri_m)
     dipole_pos_head = apply_trans(invert_transform(head_to_mri_t),
                                   dipole_pos_mri_m)
     dipole_pos = dipole_pos_head
