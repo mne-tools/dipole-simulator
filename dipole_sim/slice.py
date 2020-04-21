@@ -8,11 +8,6 @@ from forward import _create_format_coord
 
 
 def plot_slice(widget, state, axis, pos, img_data):
-    # with warnings.catch_warnings():  # Suppress DeprecationWarning
-    #     warnings.simplefilter("ignore")
-    #     img = plot_anat(t1_img, display_mode=axis, cut_coords=(pos,),
-    #                     figure=fig, dim=-0.5)
-
     if axis == 'x':
         coord = dict(x=pos)  # Used for xarray slicing below
         x_axis = 'y'
@@ -33,14 +28,12 @@ def plot_slice(widget, state, axis, pos, img_data):
 
     kwargs = dict(x=x_axis, y=y_axis,
                   cmap='gray', vmin=0, vmax=127,
-                  add_colorbar=False, add_labels=False, ax=ax,
-                  origin='lower')
+                  add_colorbar=False, add_labels=False,
+                  ax=ax)
 
     xr.plot.imshow(img_data.sel(**coord, method='nearest'), **kwargs)
     ax.set_axis_off()
     ax.set_aspect('equal')
-
-    # img.axes[pos].ax.format_coord = _create_format_coord(axis)
     ax.format_coord = _create_format_coord(axis)
     draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
@@ -54,6 +47,9 @@ def create_slice_fig(handle_click, handle_enter, handle_leave):
     fig.canvas.toolbar_visible = False
     fig.canvas.header_visible = False
     fig.canvas.resizable = False
+    ax.set_position([0, 0, 1, 1])
+    fig.tight_layout()
+    fig.set_tight_layout(True)
     return fig
 
 
