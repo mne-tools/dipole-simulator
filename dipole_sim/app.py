@@ -194,6 +194,10 @@ class App:
         self._toggle_updating_state()
         widget, markers, state = self._widget, self._markers, self._state
         in_ax = event.inaxes
+        if in_ax is None:  # User clicked into the figure, but outside an axes
+            self._toggle_updating_state()
+            return
+
         x, y = event.xdata, event.ydata
 
         # Which slice (axis) was clicked in?
