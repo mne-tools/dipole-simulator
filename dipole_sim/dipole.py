@@ -27,8 +27,8 @@ def draw_dipole_arrows(widget, state):
         dx = state['dipole_ori'][x_idx] - state['dipole_pos'][x_idx]
         dy = state['dipole_ori'][y_idx] - state['dipole_pos'][y_idx]
 
-        ax.arrow(x=x, y=y, dx=dx, dy=dy, color='white',
-                 width=3, head_width=15, length_includes_head=True,
+        ax.arrow(x=x, y=y, dx=dx, dy=dy, facecolor='white', edgecolor='black',
+                 width=5, head_width=15, length_includes_head=True,
                  label='dipole')
 
         fig.canvas.draw()
