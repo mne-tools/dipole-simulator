@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import mne
-from mne.transforms import apply_trans
+from mne.transforms import apply_trans, invert_transform
 
 from slice import create_head_grid
 from math_ import find_closest
@@ -35,7 +35,7 @@ def gen_evoked(dipole_ori, dipole_amplitude, info, fwd):
 
 def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                 exact_solution, bem_path=None, head_to_mri_t=None,
-                fwd_lookup_table=None):
+                fwd_lookup_table=None, t1_img=None):
     if fwd_lookup_table is None:
         raise ValueError('Must prodive fwd_lookup_table')
 
@@ -46,15 +46,38 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                   state['dipole_ori']['y'],
                   state['dipole_ori']['z'])
 
-    dipole_pos = apply_trans(trans=ras_to_head_t, pts=dipole_pos)
-    dipole_pos /= 1000
+    # dipole_pos = np.array(dipole_pos).reshape(1, 3)
+    # dipole_pos = apply_trans(trans=ras_to_head_t, pts=dipole_pos)
+    # dipole_pos /= 1000
 
-    dipole_ori = apply_trans(trans=ras_to_head_t, pts=dipole_ori)
-    dipole_ori /= 1000
+    # dipole_ori = np.array(dipole_ori).reshape(1, 3)
+    # dipole_ori = apply_trans(trans=ras_to_head_t, pts=dipole_ori, move=False)
+    # dipole_ori /= 1000
+    # dipole_ori /= np.linalg.norm(dipole_ori)
+
+    # dipole_pos = np.array(dipole_pos).reshape(1, 3).round(3)
+    # dipole_ori = np.array(dipole_ori).reshape(1, 3).round(3)
+
+    dipole_pos_ras = np.array(dipole_pos).reshape(1, 3)
+    dipole_pos_vox = apply_trans(t1_img.header.get_ras2vox(), dipole_pos_ras)
+    dipole_pos_mri = apply_trans(t1_img.header.get_vox2ras_tkr(),
+                                 dipole_pos_vox)
+    dipole_pos_mri_m = dipole_pos_mri / 1000.
+    print(dipole_pos_mri, dipole_pos_mri_m)
+    dipole_pos_head = apply_trans(invert_transform(head_to_mri_t),
+                                  dipole_pos_mri_m)
+    dipole_pos = dipole_pos_head
+
+    dipole_ori_ras = np.array(dipole_ori).reshape(1, 3)
+    dipole_ori_vox = apply_trans(t1_img.header.get_ras2vox(), dipole_ori_ras,
+                                 move=False)
+    dipole_ori_mri = apply_trans(t1_img.header.get_vox2ras_tkr(),
+                                 dipole_ori_vox, move=False)
+    dipole_ori_mri_m = dipole_ori_mri / 1000.
+    dipole_ori_head = apply_trans(invert_transform(head_to_mri_t),
+                                  dipole_ori_mri_m, move=False)
+    dipole_ori = dipole_ori_head
     dipole_ori /= np.linalg.norm(dipole_ori)
-
-    dipole_pos = np.array(dipole_pos).reshape(1, 3).round(3)
-    dipole_ori = np.array(dipole_ori).reshape(1, 3).round(3)
 
     dipole_amplitude = state['dipole_amplitude']
 

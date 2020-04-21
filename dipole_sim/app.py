@@ -3,6 +3,9 @@ from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
+import nibabel as nib
+import numpy as np
+import xarray as xr
 
 from slice import create_slice_fig, plot_slice, get_axis_names_from_slice
 from evoked_field import create_topomap_fig, plot_sensors, plot_evoked
@@ -32,7 +35,13 @@ class App:
         self._evoked = evoked
         self._info = evoked.info if info is None else info
         self._trans = trans
-        self._t1_img = t1_img
+
+        img, img_canonical, data_canonical_mm = self._init_mr_image(t1_img)
+        self._t1_img = img
+        self._t1_img_canonical = img_canonical
+        self._t1_img_canonical_data = data_canonical_mm
+        del img, img_canonical, data_canonical_mm
+
         self._subject = subject
         self._data_path = (pathlib.Path('data') if data_path is None
                            else pathlib.Path(data_path))
@@ -56,6 +65,23 @@ class App:
                                                     t1_img=self._t1_img)
 
         self._gen_app_layout()
+
+    @staticmethod
+    def _init_mr_image(img):
+        img_canonical = nib.as_closest_canonical(img)      
+        vox_grid = np.c_[np.arange(img_canonical.dataobj.shape[0]),
+                         np.arange(img_canonical.dataobj.shape[1]),
+                         np.arange(img_canonical.dataobj.shape[2])]
+
+        coords_mm = nib.affines.apply_affine(img_canonical.affine,
+                                             pts=vox_grid)
+        data_canonical_mm = xr.DataArray(data=img_canonical.dataobj,
+                                         dims=('x', 'y', 'z'),
+                                         coords=(coords_mm[:, 0],
+                                                 coords_mm[:, 1],
+                                                 coords_mm[:, 2]))
+
+        return img, img_canonical, data_canonical_mm
 
     def _init_state(self):
         state = dict()
@@ -182,6 +208,7 @@ class App:
         if state['mode'] == 'slice_browser':
             handle_click_in_slice_browser_mode(widget, markers, state, x, y,
                                                x_idx, y_idx, self._evoked,
+                                               self._t1_img_canonical_data,
                                                self._t1_img)
         elif state['mode'] == 'set_dipole_pos':
             handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
@@ -206,7 +233,8 @@ class App:
                         ras_to_head_t=self._ras_to_head_t,
                         exact_solution=self._exact_solution,
                         bem_path=self._bem_path, head_to_mri_t=self._trans,
-                        fwd_lookup_table=self._fwd_lookup_table)
+                        fwd_lookup_table=self._fwd_lookup_table,
+                        t1_img=self._t1_img)
 
         self._toggle_updating_state()
 
@@ -287,7 +315,7 @@ class App:
         for axis in axes:
             pos = self._state['slice_coord'][axis]['val']
             plot_slice(widget=self._widget, state=self._state, axis=axis,
-                       pos=pos, t1_img=self._t1_img)
+                       pos=pos, img_data=self._t1_img_canonical_data)
 
     def _gen_app_layout(self):
         toggle_buttons = self._widget['toggle_buttons']
@@ -330,7 +358,6 @@ class App:
 
 if __name__ == '__main__':
     import mne
-    import nilearn
 
     data_path = pathlib.Path('data')
     fwd_path = data_path / 'fwd'
@@ -347,7 +374,7 @@ if __name__ == '__main__':
     del evoked_fname
 
     t1_fname = str(subjects_dir / subject / 'mri' / 'T1.mgz')
-    t1_img = nilearn.image.load_img(t1_fname)
+    t1_img = nib.load(t1_fname)
     del t1_fname
 
     trans_fname = data_path / 'sample-trans.fif'
