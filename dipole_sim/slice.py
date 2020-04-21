@@ -46,10 +46,8 @@ def plot_slice(widget, state, axis, pos, img_data):
     label_text['z'] = (f'axial '
                        f'(z = {round(state["slice_coord"]["z"]["val"])} mm)')
 
-    label_widget = widget['label']['axis']
-    label_widget['x'].value = label_text['x']
-    label_widget['y'].value = label_text['y']
-    label_widget['z'].value = label_text['z']
+    for axis in (x_axis, y_axis):
+        _update_axis_label(widget=widget, state=state, axis=axis)
 
 
 def create_slice_fig(handle_click, handle_enter, handle_leave):
