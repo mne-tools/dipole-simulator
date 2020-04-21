@@ -2,31 +2,66 @@ import numpy as np
 import warnings
 from nilearn.plotting import plot_anat
 import matplotlib.pyplot as plt
+import xarray as xr
 
 from forward import _create_format_coord
 
 
-def plot_slice(widget, state, axis, pos, t1_img):
+def plot_slice(widget, state, axis, pos, img_data):
+    if axis == 'x':
+        coord = dict(x=pos)  # Used for xarray slicing below
+        x_axis = 'y'
+        y_axis = 'z'
+    elif axis == 'y':
+        coord = dict(y=pos)
+        x_axis = 'x'
+        y_axis = 'z'
+    elif axis == 'z':
+        coord = dict(z=pos)
+        x_axis = 'x'
+        y_axis = 'y'
+    else:
+        raise ValueError('plane must be x, y, or z')
+
     fig = widget['fig'][axis]
+    ax = fig.axes[0]
+    ax.images = []
 
-    with warnings.catch_warnings():  # Suppress DeprecationWarning
-        warnings.simplefilter("ignore")
-        img = plot_anat(t1_img, display_mode=axis, cut_coords=(pos,),
-                        figure=fig, dim=-0.5)
+    kwargs = dict(x=x_axis, y=y_axis,
+                  cmap='gray', vmin=0, vmax=127,
+                  add_colorbar=False, add_labels=False,
+                  ax=ax)
 
-    img.axes[pos].ax.format_coord = _create_format_coord(axis)
-    draw_crosshairs(widget=widget, state=state)
+    xr.plot.imshow(img_data.sel(**coord, method='nearest'), **kwargs)
+    ax.set_axis_off()
+    ax.set_aspect('equal')
+    ax.format_coord = _create_format_coord(axis)
+    # draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
+
+    label_text = state['label_text']
+    label_text['x'] = (f'sagittal '
+                       f'(x = {round(state["slice_coord"]["x"]["val"])} mm)')
+    label_text['y'] = (f'coronal '
+                       f'(y = {round(state["slice_coord"]["y"]["val"])} mm)')
+    label_text['z'] = (f'axial '
+                       f'(z = {round(state["slice_coord"]["z"]["val"])} mm)')
+
+    for axis in (x_axis, y_axis):
+        _update_axis_label(widget=widget, state=state, axis=axis)
 
 
 def create_slice_fig(handle_click, handle_enter, handle_leave):
-    fig = plt.figure(figsize=(2, 2))
+    fig, ax = plt.subplots(1, figsize=(2, 2))
     fig.canvas.mpl_connect('button_press_event', handle_click)
     fig.canvas.mpl_connect('figure_enter_event', handle_enter)
     fig.canvas.mpl_connect('figure_leave_event', handle_leave)
     fig.canvas.toolbar_visible = False
     fig.canvas.header_visible = False
     fig.canvas.resizable = False
+    ax.set_position([0, 0, 1, 1])
+    fig.tight_layout()
+    fig.set_tight_layout(True)
     return fig
 
 

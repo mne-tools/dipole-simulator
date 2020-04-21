@@ -10,7 +10,7 @@ from cursor import enable_crosshair_cursor
 
 
 def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
-                 fwd_path, subject, info, t1_img):
+                 fwd_path, subject, info, img_data, t1_img):
     if event.button != MouseButton.LEFT:
         return
 
@@ -30,7 +30,7 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
 
     if state['mode'] == 'slice_browser':
         handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
-                                           y_idx, evoked, t1_img)
+                                           y_idx, evoked, img_data)
     elif state['mode'] == 'set_dipole_pos':
         handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
                                             remaining_idx, x, y, ras_to_head_t)
@@ -50,17 +50,7 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
             state['dipole_pos'] != state['dipole_ori']):
         draw_dipole_arrows(widget, state)
 
-    draw_crosshairs(widget=widget, state=state)
-
-    if (state['dipole_pos']['x'] is not None and
-            state['dipole_ori']['x'] is not None and
-            state['dipole_pos'] != state['dipole_ori']):
-
-        try:
-            plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t)
-        except RuntimeError as e:
-            msg = f'Error while calculating generated fields:\n\n{e}'
-            print(msg)
+    # draw_crosshairs(widget=widget, state=state)
 
 
 def handle_leave(event):
@@ -88,7 +78,7 @@ def leave_set_dipole_ori_mode():
 
 
 def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
-                                       y_idx, evoked, t1_img):
+                                       y_idx, evoked, img_data):
     state['slice_coord'][x_idx]['val'] = x
     state['slice_coord'][y_idx]['val'] = y
     state['crosshair_pos'][x_idx] = x
@@ -110,13 +100,13 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
 
     # widget['fig'][x_idx].axes[0].clear()
     # widget['fig'][y_idx].axes[0].clear()
-    widget['fig'][x_idx].axes[0].images = []
-    widget['fig'][x_idx].axes[0].texts = []
-    widget['fig'][y_idx].axes[0].images = []
-    widget['fig'][y_idx].axes[0].texts = []
+    # widget['fig'][x_idx].axes[0].images = []
+    # widget['fig'][x_idx].axes[0].texts = []
+    # widget['fig'][y_idx].axes[0].images = []
+    # widget['fig'][y_idx].axes[0].texts = []
 
-    plot_slice(widget, state, x_idx, x, t1_img)
-    plot_slice(widget, state, y_idx, y, t1_img)
+    plot_slice(widget, state, x_idx, x, img_data)
+    plot_slice(widget, state, y_idx, y, img_data)
 
     enable_crosshair_cursor(widget)
     reset_topomaps(widget=widget, evoked=evoked)

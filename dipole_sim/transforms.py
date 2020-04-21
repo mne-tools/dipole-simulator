@@ -1,3 +1,5 @@
+import numpy as np
+import nibabel as nib
 from mne.transforms import combine_transforms, invert_transform, Transform
 
 
@@ -6,7 +8,8 @@ def gen_ras_to_head_trans(head_to_mri_t, t1_img):
 
     # RAS <> VOXEL
     ras_to_vox_t = Transform(fro='ras', to='mri_voxel',
-                             trans=t1_img.header.get_ras2vox())
+                             trans=np.linalg.inv(t1_img.header.get_vox2ras()))
+    #  trans=t1_img.header.get_ras2vox())
     vox_to_mri_t = Transform(fro='mri_voxel', to='mri',
                              trans=t1_img.header.get_vox2ras_tkr())
 
