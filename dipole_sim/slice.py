@@ -36,7 +36,7 @@ def plot_slice(widget, state, axis, pos, img_data):
     ax.set_axis_off()
     ax.set_aspect('equal')
     ax.format_coord = _create_format_coord(axis)
-    draw_crosshairs(widget=widget, state=state)
+    # draw_crosshairs(widget=widget, state=state)
     fig.canvas.draw()
 
     label_text = state['label_text']

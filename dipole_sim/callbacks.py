@@ -50,7 +50,7 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
             state['dipole_pos'] != state['dipole_ori']):
         draw_dipole_arrows(widget, state)
 
-    draw_crosshairs(widget=widget, state=state)
+    # draw_crosshairs(widget=widget, state=state)
 
 
 def handle_leave(event):
@@ -100,10 +100,10 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
 
     # widget['fig'][x_idx].axes[0].clear()
     # widget['fig'][y_idx].axes[0].clear()
-    widget['fig'][x_idx].axes[0].images = []
-    widget['fig'][x_idx].axes[0].texts = []
-    widget['fig'][y_idx].axes[0].images = []
-    widget['fig'][y_idx].axes[0].texts = []
+    # widget['fig'][x_idx].axes[0].images = []
+    # widget['fig'][x_idx].axes[0].texts = []
+    # widget['fig'][y_idx].axes[0].images = []
+    # widget['fig'][y_idx].axes[0].texts = []
 
     plot_slice(widget, state, x_idx, x, img_data)
     plot_slice(widget, state, y_idx, y, img_data)
