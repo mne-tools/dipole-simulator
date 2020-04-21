@@ -25,7 +25,7 @@ def plot_slice(widget, state, axis, pos, img_data):
 
     fig = widget['fig'][axis]
     ax = fig.axes[0]
-    ax.clear()
+    ax.images = []
 
     kwargs = dict(x=x_axis, y=y_axis,
                   cmap='gray', vmin=0, vmax=127,
