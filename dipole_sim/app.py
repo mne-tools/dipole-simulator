@@ -1,5 +1,5 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
-                        ToggleButtons, IntSlider)
+                        ToggleButtons, IntSlider, Tab, Layout)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -131,8 +131,10 @@ class App:
         label['dipole_ori'] = Label('Not set')
         label['dipole_pos_'] = Label('Dipole origin:')
         label['dipole_ori_'] = Label('Dipole orientation:')
+        label['status'] = Label('Status:')
         label['updating'] = Label('Ready.')
         widget['label'] = label
+        widget['tab'] = Tab(layout=Layout(width='700px'))
 
         toggle_buttons = dict(mode_selector=ToggleButtons(
             options=['Slice Browser', 'Set Dipole Origin',
@@ -157,14 +159,6 @@ class App:
         widget['label']['amplitude_slider'] = Label('Dipole amplitude in nAm')
 
         widget['output'] = output_widget
-        accordion = Accordion(
-            children=[widget['output'],
-                      Label("now this isn't too helpful now, is it")],
-            titles=('MNE Output', 'Help'))
-        accordion.set_title(0, 'MNE Output')
-        accordion.set_title(1, 'Help')
-        widget['accordion'] = accordion
-
         return widget
 
     def _init_markers(self):
@@ -254,6 +248,8 @@ class App:
         state = self._state
         widget = self._widget
 
+        widget['amplitude_slider'].disabled = True
+
         new_amp = change['new'] * 1e-9
         self._state['dipole_amplitude'] = new_amp
 
@@ -268,6 +264,7 @@ class App:
                         fwd_lookup_table=self._fwd_lookup_table,
                         t1_img=self._t1_img)
         self._toggle_updating_state()
+        widget['amplitude_slider'].disabled = False
 
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
@@ -325,38 +322,61 @@ class App:
 
     def _gen_app_layout(self):
         toggle_buttons = self._widget['toggle_buttons']
-        checkbox = self._widget['checkbox']
+        # checkbox = self._widget['checkbox']
         label = self._widget['label']
         fig = self._widget['fig']
         topomap_fig = self._widget['topomap_fig']
-        accordion = self._widget['accordion']
         dipole_amp_slider = self._widget['amplitude_slider']
+        tab = self._widget['tab']
+        output = self._widget['output']
 
         dipole_props_col = VBox(
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
              HBox([label['dipole_ori_'], label['dipole_ori']])])
 
-        dipole_amp_and_exact_sol_col = VBox(
-            [label['amplitude_slider'],
-             dipole_amp_slider,
-             checkbox['exact_solution']])
+        # dipole_amp_and_exact_sol_col = VBox(
+        #     [label['amplitude_slider'],
+        #      dipole_amp_slider,
+        #      checkbox['exact_solution']])
 
-        app = VBox([HBox([toggle_buttons['mode_selector'],
-                          dipole_amp_and_exact_sol_col]),
-                    label['updating'],
-                    HBox([VBox([label['axis']['x'], fig['x'].canvas]),
-                          VBox([label['axis']['y'], fig['y'].canvas]),
-                          VBox([label['axis']['z'], fig['z'].canvas])]),
-                    HBox([VBox([label['topomap_mag'],
-                                topomap_fig['mag'].canvas]),
-                          VBox([label['topomap_grad'],
-                                topomap_fig['grad'].canvas]),
-                          VBox([label['topomap_eeg'],
-                                topomap_fig['eeg'].canvas])]),
-                    dipole_props_col,
-                    accordion])
+        dipole_amp_col = VBox(
+            [dipole_amp_slider,
+             label['amplitude_slider']])
 
-        self._app_layout = app
+        main_tab = VBox([HBox([label['status'], label['updating']],
+                              layout=Layout(align_items='flex-end')),
+                         toggle_buttons['mode_selector'],
+                         #   dipole_amp_and_exact_sol_col]),
+                         HBox([VBox([label['axis']['x'], fig['x'].canvas],
+                                    layout=Layout(align_items='center')),
+                               VBox([label['axis']['y'], fig['y'].canvas],
+                                    layout=Layout(align_items='center')),
+                               VBox([label['axis']['z'], fig['z'].canvas],
+                                    layout=Layout(align_items='center'))]),
+                         HBox([VBox([label['topomap_mag'],
+                                    topomap_fig['mag'].canvas],
+                                    layout=Layout(align_items='center')),
+                               VBox([label['topomap_grad'],
+                                    topomap_fig['grad'].canvas],
+                                    layout=Layout(align_items='center')),
+                               VBox([label['topomap_eeg'],
+                                    topomap_fig['eeg'].canvas],
+                                    layout=Layout(align_items='center'))]),
+                         dipole_amp_col,
+                         dipole_props_col],
+                        layout=Layout(align_items='center'))
+
+        mne_output_tab = VBox([output])
+        help_tab = VBox([Label('Whoops. Somebody was lazy here.')])
+        about_tab = VBox([Label('todo')])
+
+        tab.children = [main_tab, mne_output_tab, help_tab, about_tab]
+        tab.set_title(0, 'Dipole Simulator')
+        tab.set_title(1, 'MNE-Python Output')
+        tab.set_title(2, 'Help')
+        tab.set_title(3, 'About')
+
+        self._app_layout = tab
 
     def display(self):
         IPython.display.display(self._app_layout)
