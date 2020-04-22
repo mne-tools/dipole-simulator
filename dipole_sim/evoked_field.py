@@ -150,6 +150,7 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
         ax_colorbar = fig.axes[1]
         ax_topomap.clear()
         ax_colorbar.clear()
+        ax_topomap.set_aspect('equal')
 
         if ch_type == 'eeg':
             outlines = 'head'
@@ -189,6 +190,8 @@ def create_topomap_fig():
     fig.canvas.callbacks.callbacks.clear()
     ax[0].set_axis_off()
     ax[1].set_axis_off()
+    ax[0].set_aspect('equal')
+    fig.tight_layout()
     fig.set_tight_layout(True)
     return fig
 
