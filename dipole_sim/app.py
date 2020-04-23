@@ -1,6 +1,6 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
                         ToggleButtons, IntSlider, Tab, Layout, Button,
-                        Accordion, HTML)
+                        Accordion, HTML, Dropdown, GridBox)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -18,7 +18,9 @@ from callbacks import (handle_click_in_slice_browser_mode,
                        handle_click_in_set_dipole_ori_mode)
 from dipole import (plot_dipole_pos_marker, plot_dipole_ori_marker,
                     draw_dipole_arrows, remove_dipole_arrows,
-                    remove_dipole_pos_markers, remove_dipole_ori_markers)
+                    remove_dipole_pos_markers, remove_dipole_ori_markers,
+                    update_dipole_ori, update_dipole_pos,
+                    draw_dipole_if_necessary)
 from forward import load_fwd_lookup_table
 
 
@@ -66,6 +68,14 @@ class App:
 
         self._ras_to_head_t = gen_ras_to_head_trans(head_to_mri_t=self._trans,
                                                     t1_img=self._t1_img)
+
+        self._preset_coords = {
+            'Preset 1': dict(pos=[2.94, -76.54, -0.38],
+                             ori=[1, 1, 1,]),
+            'Preset 2': dict(pos=[-50.70, -23.55, 53.65],
+                             ori=[0, 1, 0]),
+            'Preset 3': dict(pos=[21.60, 80.03, 34.01],
+                             ori=[1, 0, 0])}
 
         self._gen_app_layout()
 
@@ -181,6 +191,13 @@ class App:
         widget['quickstart_accordion'] = Accordion(
             children=[widget['quickstart_text']])
         widget['quickstart_accordion'].set_title(0, 'Quickstart')
+
+        widget['preset_dropdown'] = Dropdown(
+            options=['Select Preset…', 'Preset 1', 'Preset 2', 'Preset 3'],
+            value='Select Preset…',
+            layout=Layout(width='10em'))
+        widget['preset_dropdown'].observe(self._handle_preset_selection_change,
+                                          'value')
 
         widget['title'] = HTML(value='<h2>Dipole Similator</h2>')
 
@@ -310,6 +327,42 @@ class App:
                                             ._state['dipole_amplitude'] * 1e9)
         self._enable_crosshair_cursor()
 
+    @output_widget.capture(clear_output=True)
+    def _handle_preset_selection_change(self, change):
+        preset_name = change['new']
+        preset = self._preset_coords[preset_name]
+
+        pos = np.array(preset['pos']).astype(float)
+        ori = np.array(preset['ori']).astype(float)
+        ori /= np.linalg.norm(ori)
+
+        pos = dict(x=pos[0], y=pos[1], z=pos[2])
+        ori = dict(x=ori[0], y=ori[1], z=ori[2])
+        self._state['dipole_pos'] = pos
+        self._state['dipole_ori'] = ori
+
+        update_dipole_pos(dipole_pos_ras=pos,
+                          ras_to_head_t=self._ras_to_head_t,
+                          widget=self._widget, evoked=self._evoked)
+        update_dipole_ori(dipole_ori_ras=ori,
+                          ras_to_head_t=self._ras_to_head_t,
+                          widget=self._widget, evoked=self._evoked)
+        draw_dipole_if_necessary(state=self._state, widget=self._widget,
+                                 markers=self._markers)
+
+        state = self._state
+        widget = self._widget
+        if (state['dipole_pos']['x'] is not None and
+                state['dipole_ori']['x'] is not None and
+                state['dipole_pos'] != state['dipole_ori']):
+            plot_evoked(widget, state, fwd_path=self._fwd_path,
+                        subject=self._subject, info=self._info,
+                        ras_to_head_t=self._ras_to_head_t,
+                        exact_solution=self._exact_solution,
+                        bem_path=self._bem_path, head_to_mri_t=self._trans,
+                        fwd_lookup_table=self._fwd_lookup_table,
+                        t1_img=self._t1_img)
+
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
         widget = self._widget
@@ -376,6 +429,7 @@ class App:
         output = self._widget['output']
         reset_button = self._widget['reset_button']
         quickstart = self._widget['quickstart_accordion']
+        preset = self._widget['preset_dropdown']
 
         dipole_props_col = VBox(
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
@@ -391,10 +445,12 @@ class App:
              label['amplitude_slider']])
 
         main_tab = VBox([quickstart,
-                         HBox([label['status'], label['updating']],
-                              layout=Layout(align_items='flex-end')),
-                         HBox([toggle_buttons['mode_selector'],
-                               reset_button]),
+                         HBox([label['status'], label['updating']]),
+                         HBox([preset, reset_button],
+                              layout=Layout(display='flex', flex_flow='row',
+                                            justify_content='space-between',
+                                            width='78%')),
+                         toggle_buttons['mode_selector'],
                          #   dipole_amp_and_exact_sol_col]),
                          HBox([VBox([label['axis']['x'], fig['x'].canvas],
                                     layout=Layout(align_items='center')),
