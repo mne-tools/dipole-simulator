@@ -181,6 +181,8 @@ class App:
             children=[widget['quickstart_text']])
         widget['quickstart_accordion'].set_title(0, 'Quickstart')
 
+        widget['title'] = HTML(value='<h2>Dipole Similator</h2>')
+
         widget['output'] = output_widget
         return widget
 
@@ -362,6 +364,7 @@ class App:
                        pos=pos, img_data=self._t1_img_canonical_data)
 
     def _gen_app_layout(self):
+        title = self._widget['title']
         toggle_buttons = self._widget['toggle_buttons']
         # checkbox = self._widget['checkbox']
         label = self._widget['label']
@@ -421,7 +424,9 @@ class App:
         tab.set_title(2, 'Help')
         tab.set_title(3, 'About')
 
-        self._app_layout = tab
+        app = VBox([title, tab], layout=Layout(align_items='center'))
+
+        self._app_layout = app
 
     def display(self):
         IPython.display.display(self._app_layout)
