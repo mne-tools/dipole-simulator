@@ -310,10 +310,12 @@ class App:
         widget['amplitude_slider'].disabled = False
 
     def _handle_reset_button_click(self, button):
+        self._toggle_updating_state()
         widget = self._widget
         markers = self._markers
         state = self._state
 
+        widget['preset_dropdown'].value = 'Select Preset…'
         remove_dipole_arrows(widget=widget)
         remove_dipole_pos_markers(widget=widget, markers=markers, state=state)
         remove_dipole_ori_markers(widget=widget, markers=markers, state=state)
@@ -326,10 +328,17 @@ class App:
         widget['amplitude_slider'].value = (self
                                             ._state['dipole_amplitude'] * 1e9)
         self._enable_crosshair_cursor()
+        self._toggle_updating_state()
 
     @output_widget.capture(clear_output=True)
     def _handle_preset_selection_change(self, change):
+        self._toggle_updating_state()
+
         preset_name = change['new']
+        if preset_name == 'Select Preset…':
+            self._toggle_updating_state()
+            return
+
         preset = self._preset_coords[preset_name]
 
         pos = np.array(preset['pos']).astype(float)
@@ -340,6 +349,12 @@ class App:
         ori = dict(x=ori[0], y=ori[1], z=ori[2])
         self._state['dipole_pos'] = pos
         self._state['dipole_ori'] = ori
+        
+        for plane, coord in pos.items():
+            self._state['slice_coord'][plane]['val'] = coord
+
+        state = self._state
+        widget = self._widget
 
         update_dipole_pos(dipole_pos_ras=pos,
                           ras_to_head_t=self._ras_to_head_t,
@@ -347,11 +362,10 @@ class App:
         update_dipole_ori(dipole_ori_ras=ori,
                           ras_to_head_t=self._ras_to_head_t,
                           widget=self._widget, evoked=self._evoked)
+        self._plot_slice(axis='all')
         draw_dipole_if_necessary(state=self._state, widget=self._widget,
                                  markers=self._markers)
 
-        state = self._state
-        widget = self._widget
         if (state['dipole_pos']['x'] is not None and
                 state['dipole_ori']['x'] is not None and
                 state['dipole_pos'] != state['dipole_ori']):
@@ -362,6 +376,8 @@ class App:
                         bem_path=self._bem_path, head_to_mri_t=self._trans,
                         fwd_lookup_table=self._fwd_lookup_table,
                         t1_img=self._t1_img)
+        
+        self._toggle_updating_state()
 
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
