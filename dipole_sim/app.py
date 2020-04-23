@@ -124,12 +124,20 @@ class App:
         widget['topomap_fig'] = topomap_fig
 
         label = dict()
-        label['axis'] = dict(x=Label(state['label_text']['x']),
-                             y=Label(state['label_text']['y']),
-                             z=Label(state['label_text']['z']))
-        label['topomap_mag'] = Label(state['label_text']['topomap_mag'])
-        label['topomap_grad'] = Label(state['label_text']['topomap_grad'])
-        label['topomap_eeg'] = Label(state['label_text']['topomap_eeg'])
+        # label['axis'] = dict(x=Label(state['label_text']['x']),
+        #                      y=Label(state['label_text']['y']),
+        #                      z=Label(state['label_text']['z']))
+        # label['topomap_mag'] = Label(state['label_text']['topomap_mag'])
+        # label['topomap_grad'] = Label(state['label_text']['topomap_grad'])
+        # label['topomap_eeg'] = Label(state['label_text']['topomap_eeg'])
+
+        label['axis'] = dict(x=HTML(f"<b>{state['label_text']['x']}</b>"),
+                             y=HTML(f"<b>{state['label_text']['y']}</b>"),
+                             z=HTML(f"<b>{state['label_text']['z']}</b>"))
+        label['topomap_mag'] = HTML(f"<b>{state['label_text']['topomap_mag']}</b>")
+        label['topomap_grad'] = HTML(f"<b>{state['label_text']['topomap_grad']}</b>")
+        label['topomap_eeg'] = HTML(f"<b>{state['label_text']['topomap_eeg']}</b>")
+
         label['dipole_pos'] = Label('Not set')
         label['dipole_ori'] = Label('Not set')
         label['dipole_pos_'] = Label('Dipole origin:')
