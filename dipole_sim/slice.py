@@ -67,7 +67,7 @@ def create_slice_fig(handle_click, handle_enter, handle_leave):
 
 def _update_axis_label(widget, state, axis):
     label = widget['label']['axis'][axis]
-    label_text = state['label_text'][axis]
+    label_text = f"<b>{state['label_text'][axis]}</b>"
     label.value = label_text
 
 
