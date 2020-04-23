@@ -1,11 +1,13 @@
 from matplotlib.backend_bases import MouseButton
 from mne.transforms import apply_trans
 
-from evoked_field import plot_evoked, reset_topomaps
+from evoked_field import reset_topomaps
 from slice import plot_slice, draw_crosshairs, get_axis_names_from_slice
 from dipole import (draw_dipole_arrows, remove_dipole_arrows,
                     plot_dipole_pos_marker, remove_dipole_pos_markers,
-                    plot_dipole_ori_marker, remove_dipole_ori_markers)
+                    plot_dipole_ori_marker, remove_dipole_ori_markers,
+                    update_dipole_pos, update_dipole_ori,
+                    draw_dipole_if_necessary)
 from cursor import enable_crosshair_cursor
 
 
@@ -39,17 +41,7 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
         handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
                                             remaining_idx, x, y, ras_to_head_t)
 
-    if state['dipole_pos']['x'] is not None:
-        plot_dipole_pos_marker(widget, markers, state)
-
-    if state['dipole_ori']['x'] is not None:
-        plot_dipole_ori_marker(widget, markers, state)
-
-    if (state['dipole_pos']['x'] is not None and
-            state['dipole_ori']['x'] is not None and
-            state['dipole_pos'] != state['dipole_ori']):
-        draw_dipole_arrows(widget, state)
-
+    draw_dipole_if_necessary(state, widget, markers)
     # draw_crosshairs(widget=widget, state=state)
 
 
@@ -125,22 +117,9 @@ def handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
     dipole_pos_ras[remaining_idx] = state['slice_coord'][remaining_idx]['val']
 
     state['dipole_pos'] = dipole_pos_ras
-    dipole_pos_head = apply_trans(trans=ras_to_head_t,
-                                  pts=(dipole_pos_ras['x'],
-                                       dipole_pos_ras['y'],
-                                       dipole_pos_ras['z']))
-    dipole_pos_head /= 1000
-    dipole_pos_head = dict(x=dipole_pos_head[0], y=dipole_pos_head[1],
-                           z=dipole_pos_head[2])
-
-    label_text = (f"x={int(round(dipole_pos_ras['x']))}, "
-                  f"y={int(round(dipole_pos_ras['y']))}, "
-                  f"z={int(round(dipole_pos_ras['z']))} [mm, MRI RAS] ⟶ "
-                  f"x={round(dipole_pos_head['x'], 3)}, "
-                  f"y={round(dipole_pos_head['y'], 3)}, "
-                  f"z={round(dipole_pos_head['z'], 3)} [m, MNE Head]")
-    widget['label']['dipole_pos'].value = label_text
-    reset_topomaps(widget=widget, evoked=evoked)
+    update_dipole_pos(dipole_pos_ras=dipole_pos_ras,
+                      ras_to_head_t=ras_to_head_t,
+                      widget=widget, evoked=evoked)
     leave_set_dipole_pos_mode()
 
 
@@ -153,21 +132,7 @@ def handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
     dipole_ori_ras[remaining_idx] = state['slice_coord'][remaining_idx]['val']
 
     state['dipole_ori'] = dipole_ori_ras
-
-    dipole_ori_head = apply_trans(trans=ras_to_head_t,
-                                  pts=(dipole_ori_ras['x'],
-                                       dipole_ori_ras['y'],
-                                       dipole_ori_ras['z']))
-    dipole_ori_head /= 1000
-    dipole_ori_head = dict(x=dipole_ori_head[0], y=dipole_ori_head[1],
-                           z=dipole_ori_head[2])
-
-    label_text = (f"x={int(round(dipole_ori_ras['x']))}, "
-                  f"y={int(round(dipole_ori_ras['y']))}, "
-                  f"z={int(round(dipole_ori_ras['z']))} [mm, MRI RAS] ⟶ "
-                  f"x={round(dipole_ori_head['x'], 3)}, "
-                  f"y={round(dipole_ori_head['y'], 3)}, "
-                  f"z={round(dipole_ori_head['z'], 3)} [m, MNE Head]")
-    widget['label']['dipole_ori'].value = label_text
-    reset_topomaps(widget=widget, evoked=evoked)
+    update_dipole_ori(dipole_ori_ras=dipole_ori_ras,
+                      ras_to_head_t=ras_to_head_t,
+                      widget=widget, evoked=evoked)
     leave_set_dipole_ori_mode()
