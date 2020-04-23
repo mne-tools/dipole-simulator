@@ -1,5 +1,5 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
-                        ToggleButtons, IntSlider, Tab, Layout)
+                        ToggleButtons, IntSlider, Tab, Layout, Button)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -8,14 +8,16 @@ import numpy as np
 import xarray as xr
 
 from slice import create_slice_fig, plot_slice, get_axis_names_from_slice
-from evoked_field import create_topomap_fig, plot_sensors, plot_evoked
+from evoked_field import (create_topomap_fig, plot_sensors, plot_evoked,
+                          reset_topomaps)
 from cursor import enable_crosshair_cursor
 from transforms import gen_ras_to_head_trans
 from callbacks import (handle_click_in_slice_browser_mode,
                        handle_click_in_set_dipole_pos_mode,
                        handle_click_in_set_dipole_ori_mode)
 from dipole import (plot_dipole_pos_marker, plot_dipole_ori_marker,
-                    draw_dipole_arrows)
+                    draw_dipole_arrows, remove_dipole_arrows,
+                    remove_dipole_pos_markers, remove_dipole_ori_markers)
 from forward import load_fwd_lookup_table
 
 
@@ -138,10 +140,15 @@ class App:
 
         toggle_buttons = dict(mode_selector=ToggleButtons(
             options=['Slice Browser', 'Set Dipole Origin',
-                     'Set Dipole Orientation']))
+                     'Set Dipole Orientation'],
+            button_style='primary'))
         toggle_buttons['mode_selector'].observe(self._handle_view_mode_change,
                                                 'value')
         widget['toggle_buttons'] = toggle_buttons
+        widget['reset_button'] = Button(description='Reset',
+                                        button_style='danger',
+                                        layout=Layout(width='70px'))
+        widget['reset_button'].on_click(self._handle_reset_button_click)
 
         checkbox = dict(exact_solution=Checkbox(
             value=self._exact_solution,
@@ -266,6 +273,24 @@ class App:
         self._toggle_updating_state()
         widget['amplitude_slider'].disabled = False
 
+    def _handle_reset_button_click(self, button):
+        widget = self._widget
+        markers = self._markers
+        state = self._state
+
+        remove_dipole_arrows(widget=widget)
+        remove_dipole_pos_markers(widget=widget, markers=markers, state=state)
+        remove_dipole_ori_markers(widget=widget, markers=markers, state=state)
+
+        self._state = self._init_state()
+        self._plot_slice(axis='all')
+        reset_topomaps(widget=widget, evoked=self._evoked)
+        widget['label']['dipole_pos'].value = 'Not set'
+        widget['label']['dipole_ori'].value = 'Not set'
+        widget['amplitude_slider'].value = (self
+                                            ._state['dipole_amplitude'] * 1e9)
+        self._enable_crosshair_cursor()
+
     def _plot_dipole_markers_and_arrow(self):
         state = self._state
         widget = self._widget
@@ -329,6 +354,7 @@ class App:
         dipole_amp_slider = self._widget['amplitude_slider']
         tab = self._widget['tab']
         output = self._widget['output']
+        reset_button = self._widget['reset_button']
 
         dipole_props_col = VBox(
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
@@ -345,7 +371,8 @@ class App:
 
         main_tab = VBox([HBox([label['status'], label['updating']],
                               layout=Layout(align_items='flex-end')),
-                         toggle_buttons['mode_selector'],
+                         HBox([toggle_buttons['mode_selector'],
+                               reset_button]),
                          #   dipole_amp_and_exact_sol_col]),
                          HBox([VBox([label['axis']['x'], fig['x'].canvas],
                                     layout=Layout(align_items='center')),
