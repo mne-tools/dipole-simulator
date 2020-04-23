@@ -1,5 +1,6 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
-                        ToggleButtons, IntSlider, Tab, Layout, Button)
+                        ToggleButtons, IntSlider, Tab, Layout, Button,
+                        Accordion, HTML)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -164,6 +165,21 @@ class App:
         widget['amplitude_slider'].observe(self._handle_amp_change,
                                            names='value')
         widget['label']['amplitude_slider'] = Label('Dipole amplitude in nAm')
+
+        widget['quickstart_text'] = HTML(
+            value=('<ul>'
+                   '<li>Select the desired brain slices in the '
+                   '<b>Slice Browser.</b></li>'
+                   '<li>Choose the location of the dipole via '
+                   '<b>Set Dipole Origin.</b></li>'
+                   '<li>Orient the dipole via '
+                   '<b>Set Dipole Orientation.</b></li>'
+                   '<li>Adjust the <b>dipole amplitude</b> '
+                   'using the slider below the topographic maps.</li>'
+                   '</ul>'))
+        widget['quickstart_accordion'] = Accordion(
+            children=[widget['quickstart_text']])
+        widget['quickstart_accordion'].set_title(0, 'Quickstart')
 
         widget['output'] = output_widget
         return widget
@@ -355,6 +371,7 @@ class App:
         tab = self._widget['tab']
         output = self._widget['output']
         reset_button = self._widget['reset_button']
+        quickstart = self._widget['quickstart_accordion']
 
         dipole_props_col = VBox(
             [HBox([label['dipole_pos_'], label['dipole_pos']]),
@@ -369,7 +386,8 @@ class App:
             [dipole_amp_slider,
              label['amplitude_slider']])
 
-        main_tab = VBox([HBox([label['status'], label['updating']],
+        main_tab = VBox([quickstart,
+                         HBox([label['status'], label['updating']],
                               layout=Layout(align_items='flex-end')),
                          HBox([toggle_buttons['mode_selector'],
                                reset_button]),
