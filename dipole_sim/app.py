@@ -124,13 +124,6 @@ class App:
         widget['topomap_fig'] = topomap_fig
 
         label = dict()
-        # label['axis'] = dict(x=Label(state['label_text']['x']),
-        #                      y=Label(state['label_text']['y']),
-        #                      z=Label(state['label_text']['z']))
-        # label['topomap_mag'] = Label(state['label_text']['topomap_mag'])
-        # label['topomap_grad'] = Label(state['label_text']['topomap_grad'])
-        # label['topomap_eeg'] = Label(state['label_text']['topomap_eeg'])
-
         label['axis'] = dict(x=HTML(f"<b>{state['label_text']['x']}</b>"),
                              y=HTML(f"<b>{state['label_text']['y']}</b>"),
                              z=HTML(f"<b>{state['label_text']['z']}</b>"))
