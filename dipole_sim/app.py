@@ -199,7 +199,7 @@ class App:
         widget['preset_dropdown'].observe(self._handle_preset_selection_change,
                                           'value')
 
-        widget['title'] = HTML(value='<h2>Dipole Similator</h2>')
+        widget['title'] = HTML(value='<h2>Dipole Simulator</h2>')
 
         widget['output'] = output_widget
         return widget
