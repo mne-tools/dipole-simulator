@@ -161,7 +161,6 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
                             colorbar=False,
                             outlines=outlines,
                             times=evoked.times[-1],
-                            res=256,
                             show=False,
                             axes=ax_topomap)
         ax_topomap.set_title(None)
@@ -175,6 +174,10 @@ def plot_evoked(widget, state, fwd_path, subject, info, ras_to_head_t,
             label = 'fT/cm'
         elif ch_type == 'eeg':
             label = 'µV'
+            # Scale the topomap to approx. the same size as the MEG topomaps.
+            mag_topomap_ax = widget['topomap_fig']['mag'].axes[0]
+            ax_topomap.set_xlim(np.array(mag_topomap_ax.get_xlim()) * 1.05)
+            ax_topomap.set_ylim(np.array(mag_topomap_ax.get_ylim()) * 1.05)
 
         cb.set_label(label, fontweight='bold')
         fig.canvas.draw()
