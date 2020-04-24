@@ -1,6 +1,6 @@
 from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
                         ToggleButtons, IntSlider, Tab, Layout, Button,
-                        Accordion, HTML, Dropdown, GridBox)
+                        Accordion, HTML, Dropdown, GridspecLayout)
 import IPython.display
 import pathlib
 from matplotlib.backend_bases import MouseButton
@@ -64,7 +64,6 @@ class App:
         self._plot_slice(axis='all')
 
         self._plot_sensors()
-        self._enable_crosshair_cursor()
 
         self._ras_to_head_t = gen_ras_to_head_trans(head_to_mri_t=self._trans,
                                                     t1_img=self._t1_img)
@@ -78,6 +77,7 @@ class App:
                              ori=[1, 0, 0])}
 
         self._gen_app_layout()
+        self._enable_crosshair_cursor()
 
     @staticmethod
     def _init_mr_image(img):
@@ -148,18 +148,21 @@ class App:
         label['status'] = Label('Status:')
         label['updating'] = Label('Ready.')
         widget['label'] = label
-        widget['tab'] = Tab(layout=Layout(width='700px'))
+        widget['tab'] = Tab(layout=Layout(width='700'))
 
-        toggle_buttons = dict(mode_selector=ToggleButtons(
-            options=['Slice Browser', 'Set Dipole Origin',
-                     'Set Dipole Orientation'],
-            button_style='primary'))
+        toggle_buttons = dict(
+            mode_selector=ToggleButtons(
+                options=['Slice Browser', 'Set Dipole Origin',
+                         'Set Dipole Orientation'],
+                button_style='primary',
+                layout=Layout(width='auto'))
+            )
         toggle_buttons['mode_selector'].observe(self._handle_view_mode_change,
                                                 'value')
         widget['toggle_buttons'] = toggle_buttons
         widget['reset_button'] = Button(description='Reset',
                                         button_style='danger',
-                                        layout=Layout(width='70px'))
+                                        layout=Layout(width='auto'))
         widget['reset_button'].on_click(self._handle_reset_button_click)
 
         checkbox = dict(exact_solution=Checkbox(
@@ -195,7 +198,7 @@ class App:
         widget['preset_dropdown'] = Dropdown(
             options=['Select Preset…', 'Preset 1', 'Preset 2', 'Preset 3'],
             value='Select Preset…',
-            layout=Layout(width='10em'))
+            layout=Layout(width='auto'))
         widget['preset_dropdown'].observe(self._handle_preset_selection_change,
                                           'value')
 
@@ -460,13 +463,17 @@ class App:
             [dipole_amp_slider,
              label['amplitude_slider']])
 
-        main_tab = VBox([quickstart,
-                         HBox([label['status'], label['updating']]),
-                         HBox([preset, reset_button],
-                              layout=Layout(display='flex', flex_flow='row',
-                                            justify_content='space-between',
-                                            width='78%')),
-                         toggle_buttons['mode_selector'],
+        grid = GridspecLayout(3, 3, grid_gap='0', width="95%")
+        grid[0, 0] = HBox([label['status'], label['updating']])
+        grid[1, 0] = preset
+        grid[1, -1] = reset_button
+        grid[2, :3] = HBox([toggle_buttons['mode_selector']],
+                           layout=Layout(display='flex',
+                                         flex_flow='column',
+                                         align_items='center',
+                                         width='100%'))
+
+        main_tab = VBox([grid,
                          #   dipole_amp_and_exact_sol_col]),
                          HBox([VBox([label['axis']['x'], fig['x'].canvas],
                                     layout=Layout(align_items='center')),
@@ -497,7 +504,7 @@ class App:
         tab.set_title(2, 'Help')
         tab.set_title(3, 'About')
 
-        app = VBox([title, tab], layout=Layout(align_items='center'))
+        app = VBox([title, quickstart, tab], layout=Layout(align_items='center'))
 
         self._app_layout = app
 
