@@ -496,7 +496,43 @@ class App:
 
         mne_output_tab = VBox([output])
         help_tab = VBox([Label('Whoops. Somebody was lazy here.')])
-        about_tab = VBox([Label('todo')])
+
+        about_text = ('<h3>M/EEG Dipole Simulator</h3>\n'
+                      '<p>An interactive demonstration of how dipole location '
+                      'and orientation affect MEG and EEG sensor signals.'
+                      '</p>\n'
+                      '<p><b>This is still '
+                      '<a href="https://github.com/hoechenberger/dipoles_demo/issues/26">'
+                      'work in progress</a></b></p>\n'
+                      '<h4>Contributors</h4>\n'
+                      '<ul>\n'
+                      '<li>Idea & Conceptualization: '
+                      '<b>Maximilien Chaumon</b> '
+                      '(<a href="https://github.com/dnacombo">GitHub</a>, '
+                      '<a href="https://twitter.com/@cuttingEEG">Twitter)</a>'
+                      '</li>\n'
+                      '<li>Conceptualization & Supervision: '
+                      '<b>Alexandre Gramfort</b> '
+                      '(<a href="https://github.com/agramfort">GitHub</a>, '
+                      '<a href="https://twitter.com/agramfort">Twitter</a>)'
+                      '</li>\n'
+                      '<li>Testing & Feedback: '
+                      '<b>Sophie Herbst</b> '
+                      '(<a href="https://github.com/SophieHerbst">GitHub</a>, '
+                      '<a href="https://twitter.com/herbstso">Twitter</a>) & '
+                      '<b>Virginie van Wassenhove</b> '
+                      '(<a href="https://github.com/virvw">GitHub</a>, '
+                      '<a href="https://twitter.com/virginie_vw">Twitter</a>)'
+                      '</li>\n'
+                      '<li>Implementation: '
+                      '<b>Richard Höchenberger</b> '
+                      '(<a href="https://github.com/hoechenberger">GitHub</a>, '
+                      '<a href="https://twitter.com/RHoechenberger">Twitter</a>)'
+                      '</li>\n'
+                      '</ul>\n')
+
+        about_tab = VBox([HTML(about_text)])
+        del about_text
 
         tab.children = [main_tab, mne_output_tab, help_tab, about_tab]
         tab.set_title(0, 'Dipole Simulator')
