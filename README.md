@@ -1,7 +1,7 @@
 
 # M/EEG Dipole Simulator
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hoechenberger/dipoles_demo/master?urlpath=voila%2Frender%2Findex.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mne-tools/dipole-simulator/master?urlpath=voila%2Frender%2Findex.ipynb)
 
 An interactive demonstration of how dipole location and orientation affect MEG
 and EEG sensor signals.
