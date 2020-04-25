@@ -8,7 +8,10 @@ and EEG sensor signals.
 
 **This is still [work in progress](https://github.com/hoechenberger/dipoles_demo/issues/26).**
 
-Start the application by clicking on the ``launch binder`` button above. Binder might take a while to start up, so please be patient.
+### Live Demo
+The latest development version is continuously deployed to Binder. It might take a while to start up, so please be patient. 
+
+**[⮕ Launch the Dipole Simulator](https://mybinder.org/v2/gh/mne-tools/dipole-simulator/master?urlpath=voila%2Frender%2Findex.ipynb)**
 
 ### Screenshot
 
