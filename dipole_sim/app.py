@@ -183,14 +183,18 @@ class App:
         widget['quickstart_text'] = HTML(
             value=('<ul>'
                    '<li>Select the desired brain slices in the '
-                   '<b>Slice Browser.</b></li>'
+                   '<b>Slice Browser (or use a preset).</b></li>'
                    '<li>Choose the location of the dipole via '
                    '<b>Set Dipole Origin.</b></li>'
                    '<li>Orient the dipole via '
                    '<b>Set Dipole Orientation.</b></li>'
                    '<li>Adjust the <b>dipole amplitude</b> '
                    'using the slider below the topographic maps.</li>'
-                   '</ul>'))
+                   '</ul>\n'
+                   '<p><b>This application is still '
+                   '<a href="https://github.com/hoechenberger/dipoles_demo/issues/26">'
+                   'work in progress</a>.</b></p>'))
+
         widget['quickstart_accordion'] = Accordion(
             children=[widget['quickstart_text']])
         widget['quickstart_accordion'].set_title(0, 'Quickstart')
@@ -501,9 +505,9 @@ class App:
                       '<p>An interactive demonstration of how dipole location '
                       'and orientation affect MEG and EEG sensor signals.'
                       '</p>\n'
-                      '<p><b>This is still '
+                      '<p><b>This application is still '
                       '<a href="https://github.com/hoechenberger/dipoles_demo/issues/26">'
-                      'work in progress</a></b></p>\n'
+                      'work in progress</a>.</b></p>\n'
                       '<h4>Contributors</h4>\n'
                       '<ul>\n'
                       '<li>Idea & Conceptualization: '
