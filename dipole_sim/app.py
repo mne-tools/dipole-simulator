@@ -533,7 +533,11 @@ class App:
                       '(<a href="https://github.com/hoechenberger">GitHub</a>, '
                       '<a href="https://twitter.com/RHoechenberger">Twitter</a>)'
                       '</li>\n'
-                      '</ul>\n')
+                      '</ul>\n'
+                      '<h4>Funding</h4>\n'
+                      'This work was supported by the '
+                      '<a href="https://anr.fr/fr/lanr-et-la-recherche/engagements-et-valeurs/la-science-ouverte/les-projets-laureats-de-lappel-flash-science-ouverte/projet-meegbidsfr/">meegBIDS.fr grant</a> '
+                      'of the Agence Nationale de la Recherche (ANR).')
 
         about_tab = VBox([HTML(about_text)])
         del about_text

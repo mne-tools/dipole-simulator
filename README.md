@@ -36,3 +36,5 @@ The latest development version is continuously deployed to Binder. It might take
   ([GitHub](https://github.com/hoechenberger),
   [Twitter](https://twitter.com/RHoechenberger))
 
+### Funding
+This work was supported by the [*<span>meegBIDS.fr* grant](https://anr.fr/fr/lanr-et-la-recherche/engagements-et-valeurs/la-science-ouverte/les-projets-laureats-de-lappel-flash-science-ouverte/projet-meegbidsfr/) of the *Agence Nationale de la Recherche* (ANR).
