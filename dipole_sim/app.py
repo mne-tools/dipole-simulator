@@ -1,4 +1,4 @@
-from ipywidgets import (Accordion, Label, Checkbox, Output, VBox, HBox,
+from ipywidgets import (Label, Checkbox, Output, VBox, HBox,
                         ToggleButtons, IntSlider, Tab, Layout, Button,
                         Accordion, HTML, Dropdown, GridspecLayout)
 import IPython.display
@@ -70,18 +70,18 @@ class App:
 
         self._preset_coords = {
             'Preset 1': dict(pos=[2.94, -76.54, -0.38],
-                             ori=[1, 1, 1,]),
+                             ori=[1., 1., 1.]),
             'Preset 2': dict(pos=[-50.70, -23.55, 53.65],
-                             ori=[0, 1, 0]),
+                             ori=[0., 1., 0.]),
             'Preset 3': dict(pos=[21.60, 80.03, 34.01],
-                             ori=[1, 0, 0])}
+                             ori=[1., 0., 0.])}
 
         self._gen_app_layout()
         self._enable_crosshair_cursor()
 
     @staticmethod
     def _init_mr_image(img):
-        img_canonical = nib.as_closest_canonical(img)      
+        img_canonical = nib.as_closest_canonical(img)
         vox_grid = np.c_[np.arange(img_canonical.dataobj.shape[0]),
                          np.arange(img_canonical.dataobj.shape[1]),
                          np.arange(img_canonical.dataobj.shape[2])]
@@ -356,7 +356,7 @@ class App:
         ori = dict(x=ori[0], y=ori[1], z=ori[2])
         self._state['dipole_pos'] = pos
         self._state['dipole_ori'] = ori
-        
+
         for plane, coord in pos.items():
             self._state['slice_coord'][plane]['val'] = coord
 
@@ -383,7 +383,7 @@ class App:
                         bem_path=self._bem_path, head_to_mri_t=self._trans,
                         fwd_lookup_table=self._fwd_lookup_table,
                         t1_img=self._t1_img)
-        
+
         self._toggle_updating_state()
 
     def _plot_dipole_markers_and_arrow(self):
