@@ -2,14 +2,11 @@ name: dipole-demo
 channels:
 - conda-forge
 dependencies:
-- python >=3.6
-- numpy
-- xarray
-- scipy
-- nilearn
-- matplotlib-base
-- ipywidgets
+- mne ~=1.0.3
+- matplotlib-base ~=3.5.2
+- xarray ~=2022.3.0
+- nilearn ~=0.9.1
+- ipywidgets ~=7.7.0
+- ipympl ~=0.9.1
+- requests ~=2.27.1
 - voila
-- ipympl
-- requests
-- mne =0.20

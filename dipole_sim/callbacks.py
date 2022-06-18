@@ -1,18 +1,18 @@
 from matplotlib.backend_bases import MouseButton
-from mne.transforms import apply_trans
 
 from evoked_field import reset_topomaps
-from slice import plot_slice, draw_crosshairs, get_axis_names_from_slice
-from dipole import (draw_dipole_arrows, remove_dipole_arrows,
-                    plot_dipole_pos_marker, remove_dipole_pos_markers,
-                    plot_dipole_ori_marker, remove_dipole_ori_markers,
+from slice import plot_slice, get_axis_names_from_slice
+from dipole import (remove_dipole_arrows,
+                    remove_dipole_pos_markers,
+                    remove_dipole_ori_markers,
                     update_dipole_pos, update_dipole_ori,
                     draw_dipole_if_necessary)
 from cursor import enable_crosshair_cursor
 
 
-def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
-                 fwd_path, subject, info, img_data, t1_img):
+def handle_click(
+    *, event, widget, markers, state, evoked, ras_to_head_t, img_data
+):
     if event.button != MouseButton.LEFT:
         return
 
@@ -31,15 +31,23 @@ def handle_click(event, widget, markers, state, evoked, ras_to_head_t,
     remaining_idx = axis
 
     if state['mode'] == 'slice_browser':
-        handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
-                                           y_idx, evoked, img_data)
+        handle_click_in_slice_browser_mode(
+            widget=widget, markers=markers, state=state, x=x, y=y,
+            x_idx=x_idx, y_idx=y_idx, evoked=evoked, img_data=img_data
+        )
     elif state['mode'] == 'set_dipole_pos':
-        handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
-                                            remaining_idx, x, y, ras_to_head_t)
+        handle_click_in_set_dipole_pos_mode(
+            widget=widget, state=state, x_idx=x_idx, y_idx=y_idx,
+            remaining_idx=remaining_idx, x=x, y=y,
+            ras_to_head_t=ras_to_head_t, evoked=evoked
+        )
     elif state['mode'] == 'set_dipole_ori':
         # Construct the 3D coordinates of the clicked-on point
-        handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
-                                            remaining_idx, x, y, ras_to_head_t)
+        handle_click_in_set_dipole_ori_mode(
+            widget=widget, state=state, x_idx=x_idx, y_idx=y_idx,
+            remaining_idx=remaining_idx, x=x, y=y,
+            ras_to_head_t=ras_to_head_t, evoked=evoked
+        )
 
     draw_dipole_if_necessary(state, widget, markers)
     # draw_crosshairs(widget=widget, state=state)
@@ -69,8 +77,10 @@ def leave_set_dipole_ori_mode():
     pass
 
 
-def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
-                                       y_idx, evoked, img_data):
+def handle_click_in_slice_browser_mode(
+    *, widget, markers, state, x, y, x_idx,
+    y_idx, evoked, img_data
+):
     state['slice_coord'][x_idx]['val'] = x
     state['slice_coord'][y_idx]['val'] = y
     state['crosshair_pos'][x_idx] = x
@@ -104,9 +114,11 @@ def handle_click_in_slice_browser_mode(widget, markers, state, x, y, x_idx,
     reset_topomaps(widget=widget, evoked=evoked)
 
 
-def handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
-                                        remaining_idx, x, y, ras_to_head_t,
-                                        evoked):
+def handle_click_in_set_dipole_pos_mode(
+    *, widget, state, x_idx, y_idx,
+    remaining_idx, x, y, ras_to_head_t,
+    evoked
+):
     # for axis in state['dipole_pos'].keys():
     #     state['dipole_pos'][axis] = state['slice_coord'][axis]['val']
 
@@ -123,9 +135,11 @@ def handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
     leave_set_dipole_pos_mode()
 
 
-def handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
-                                        remaining_idx, x, y, ras_to_head_t,
-                                        evoked):
+def handle_click_in_set_dipole_ori_mode(
+    *, widget, state, x_idx, y_idx,
+    remaining_idx, x, y, ras_to_head_t,
+    evoked
+):
     dipole_ori_ras = dict()
     dipole_ori_ras[x_idx] = x
     dipole_ori_ras[y_idx] = y

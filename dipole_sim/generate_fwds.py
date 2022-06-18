@@ -29,8 +29,7 @@ del bem_fname
 evoked_fname = data_path / f'{subject}-ave.fif'
 evoked = mne.read_evokeds(evoked_fname, verbose='warning')[0]
 evoked.pick_types(meg=True, eeg=True)
-info = evoked.info
-info['projs'] = []
+info = evoked.copy().del_proj().info
 info['bads'] = []
 del evoked_fname, evoked
 

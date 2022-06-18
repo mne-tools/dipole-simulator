@@ -1,6 +1,4 @@
 import numpy as np
-import warnings
-from nilearn.plotting import plot_anat
 import matplotlib.pyplot as plt
 import xarray as xr
 
@@ -25,7 +23,10 @@ def plot_slice(widget, state, axis, pos, img_data):
 
     fig = widget['fig'][axis]
     ax = fig.axes[0]
-    ax.images = []
+
+    assert len(ax.images) <= 1
+    if ax.images:
+        ax.images[0].remove()
 
     kwargs = dict(x=x_axis, y=y_axis,
                   cmap='gray', vmin=0, vmax=127,
@@ -136,7 +137,8 @@ def create_head_grid(info, grid_steps=50):
     return grid
 
 
-def get_axis_names_from_slice(slice_view, all_axes):
+def get_axis_names_from_slice(slice_view):
+    assert slice_view in ('x', 'y', 'z')
     if slice_view == 'x':
         x_idx = 'y'
         y_idx = 'z'
