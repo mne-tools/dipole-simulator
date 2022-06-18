@@ -250,8 +250,7 @@ class App:
             if fig is in_ax.figure:
                 break
 
-        x_idx, y_idx = get_axis_names_from_slice(slice_view=axis,
-                                                 all_axes=widget['fig'].keys())
+        x_idx, y_idx = get_axis_names_from_slice(slice_view=axis)
         remaining_idx = axis
 
         if state['mode'] == 'slice_browser':
@@ -259,16 +258,20 @@ class App:
                                                x_idx, y_idx, self._evoked,
                                                self._t1_img_canonical_data)
         elif state['mode'] == 'set_dipole_pos':
-            handle_click_in_set_dipole_pos_mode(widget, state, x_idx, y_idx,
-                                                remaining_idx, x, y,
-                                                self._ras_to_head_t,
-                                                evoked=self._evoked)
+            handle_click_in_set_dipole_pos_mode(
+                widget=widget, state=self._state, x_idx=x_idx, y_idx=y_idx,
+                remaining_idx=remaining_idx, x=x, y=y,
+                ras_to_head_t=self._ras_to_head_t,
+                evoked=self._evoked
+            )
         elif state['mode'] == 'set_dipole_ori':
             # Construct the 3D coordinates of the clicked-on point
-            handle_click_in_set_dipole_ori_mode(widget, state, x_idx, y_idx,
-                                                remaining_idx, x, y,
-                                                self._ras_to_head_t,
-                                                evoked=self._evoked)
+            handle_click_in_set_dipole_ori_mode(
+                widget=widget, state=self._state, x_idx=x_idx, y_idx=y_idx,
+                remaining_idx=remaining_idx, x=x, y=y,
+                ras_to_head_t=self._ras_to_head_t,
+                evoked=self._evoked
+            )
 
         self._plot_dipole_markers_and_arrow()
         self._enable_crosshair_cursor()
@@ -568,8 +571,7 @@ if __name__ == '__main__':
     evoked = mne.read_evokeds(evoked_fname, verbose='warning')[0]
     evoked.pick_types(meg=True, eeg=True)
 
-    info = evoked.info
-    info['projs'] = []
+    info = evoked.copy().del_proj().info
     info['bads'] = []
     del evoked_fname
 

@@ -5,9 +5,10 @@ from evoked_field import reset_topomaps
 def remove_dipole_arrows(widget):
     for axis, fig in widget['fig'].items():
         ax = widget['fig'][axis].axes[0]
-        artists_to_keep = [artist for artist in ax.artists
-                           if artist.get_label() != 'dipole']
-        ax.artists = artists_to_keep
+        for child in ax.get_children():
+            if child.get_label() == 'dipole_arrow':
+                child.remove()
+
         fig.canvas.draw()
 
 
@@ -33,7 +34,7 @@ def draw_dipole_arrows(widget, state):
 
         ax.arrow(x=x, y=y, dx=dx, dy=dy, facecolor='white', edgecolor='black',
                  width=5, head_width=15, length_includes_head=True,
-                 label='dipole')
+                 label='dipole_arrow')
 
         fig.canvas.draw()
 
@@ -94,7 +95,6 @@ def plot_dipole_ori_marker(widget, markers, state):
         ax = widget['fig'][axis].axes[0]
         markers['dipole_ori'][axis] = ax.scatter(x, y, marker='x', s=50,
                                                  facecolors='r',
-                                                 edgecolors='r',
                                                  label='dipole_ori_marker')
         widget['fig'][axis].canvas.draw()
         # FIXME there must be a public function fore this?
