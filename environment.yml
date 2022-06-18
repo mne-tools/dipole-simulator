@@ -2,6 +2,7 @@ name: dipole-demo
 channels:
 - conda-forge
 dependencies:
+- python ~=3.10.0
 - mne-base ~=1.0.3
 - matplotlib-base ~=3.5.2
 - xarray ~=2022.3.0
