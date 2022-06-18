@@ -254,9 +254,11 @@ class App:
         remaining_idx = axis
 
         if state['mode'] == 'slice_browser':
-            handle_click_in_slice_browser_mode(widget, markers, state, x, y,
-                                               x_idx, y_idx, self._evoked,
-                                               self._t1_img_canonical_data)
+            handle_click_in_slice_browser_mode(
+                widget=widget, markers=markers, state=state, x=x, y=y,
+                x_idx=x_idx, y_idx=y_idx, evoked=self._evoked,
+                img_data=self._t1_img_canonical_data
+            )
         elif state['mode'] == 'set_dipole_pos':
             handle_click_in_set_dipole_pos_mode(
                 widget=widget, state=self._state, x_idx=x_idx, y_idx=y_idx,
